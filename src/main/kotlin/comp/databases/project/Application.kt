@@ -1,6 +1,6 @@
 package comp.databases.project
 
-import comp.databases.project.data.DatabaseProvider
+import comp.databases.project.book.books
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.response.respondText
@@ -12,9 +12,7 @@ fun Application.main() {
         get("/") {
             call.respondText("Hello World!")
         }
-        get("/book") {
-            val books = DatabaseProvider.database.bookQueries.select().executeAsList()
-            call.respondText("$books")
-        }
+
+        books()
     }
 }
