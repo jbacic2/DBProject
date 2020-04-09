@@ -1,0 +1,36 @@
+{
+  "name": "dbproject",
+  "version": "1.0.0",
+  "description": "This repo is for my bookstore database project",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jbacic2/DBProject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jbacic2/DBProject/issues"
+  },
+  "homepage": "https://github.com/jbacic2/DBProject#readme",
+  "dependencies": {
+    "@material-ui/core": "^4.9.9",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.33",
+    "@types/react-dom": "^16.9.6",
+    "html-webpack-plugin": "^4.0.4",
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  }
+}
