@@ -1,5 +1,19 @@
-CREATE TRIGGER change_quantity_in_cart AFTER UPDATE OF quantity ON book_ordered OR INSERT ON book_ordered
-	EXECUTE PROCEDURE check_quantity_in_cart ();
+--This will make sure that no cart is holding more books than in stock when adding to cart
+CREATE TRIGGER change_quantity_in_cart AFTER UPDATE OF quantity ON book_ordered 
+	EXECUTE PROCEDURE change_quantity_in_cart_tf;
+
+CREATE TRIGGER change_quantity_in_cart AFTER INSERT ON book_ordered
+	EXECUTE PROCEDURE check_quantity_in_cart();
+
+--makes sure that only valid days are entered 
+CREATE TRIGGER change_quantity_in_cart AFTER UPDATE OF restock_email 
+	FOR EACH ROW 
+	WHEN((OLD.day IS DISTINCT FROM NEW.day) OR (OLD.month IS DISTINCT FROM NEW.month) OR (OLD.year IS DISTINCT FROM NEW.year) 
+		IF(check_date(NEW.day, NEW.month, NEW.year))
+		BEGIN
+			ROLLBACK;
+		END;
+		END IF;
 	
 
 -- when order status is changed from 'Cart' to 'Awaiting Fulfillment' this is called to change the amount in stock,

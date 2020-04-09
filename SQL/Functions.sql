@@ -31,8 +31,68 @@ create function check_date (day int, month int, year int)
 	return valid_date;
 	end; $$ language plpgsql;
 	
+create function check_date_exp_tf ()
+	returns trigger as $$
+	begin
+		IF NOT check_date(NEW.exp_day,NEW.exp_month,NEW.exp_year) THEN
+		RAISE EXCEPTION 'Invalid Date: %, %, % is not a real day', NEW.exp_day,NEW.exp_month,NEW.exp_year;
+		END IF;
+	RETURN NEW;
+	END; $$ LANGUAGE plpgsql;
 	
-CREATE PROCEDURE check_quantity_in_cart ()
+CREATE FUNCTION check_quantity_in_cart() 
+  RETURNS VOID 
+AS
+$$
+DECLARE 
+	 r books_in_carts%rowtype;
+BEGIN
+    FOR r in SELECT * 
+	FROM cart_book_quantity_info
+	LOOP
+        IF r.quantity > r.stock THEN
+				UPDATE book_ordred
+				SET quantity = r.stock 
+				WHERE order_num = r.order_num AND isbn=r.isbn;
+		END IF;
+    END LOOP;
+END;
+$$ 
+LANGUAGE plpgsql;
+
+
+CREATE FUNCTION update_stock (order_num INT)
+  RETURNS VOID 
+AS
+$$
+DECLARE 
+	 r book_ordered%rowtype;
+BEGIN
+    FOR r in SELECT * 
+	FROM book_ordered
+	WHERE book_ordred.order_num = update_stock.order_num
+	LOOP
+        UPDATE book
+			SET stock = stock - r.quantity
+			WHERE book.isbn = r.isbn;
+    END LOOP;
+END;
+$$ 
+LANGUAGE plpgsql;
+
+
+CREATE FUNCTION change_quantity_in_cart_tf() 
+   RETURNS trigger AS
+$$
+BEGIN
+	PERFORM check_quantity_in_cart();
+END;
+$$ 
+LANGUAGE plpgsql;
+
+
+
+/*CREATE PROCEDURE check_quantity_in_cart ()
 	BEGIN 
 		FOR r IN
 			SELECT * FROM cust_order NATURAL JOIN book_ordred NATURAL JOIN book
@@ -59,7 +119,7 @@ CREATE PROCEDURE update_stock (order_num INT)
 		END LOOP;
 	END; $$ LANGUAGE plpgsql;
 
-				
+*/
 
 /*create function monthly_sales (year int)
 	returns tabel (

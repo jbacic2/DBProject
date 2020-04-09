@@ -7,7 +7,14 @@ exp_month		int check(exp_month>=1 and exp_month<=12),
 exp_year		int check(exp_year>=2000 and exp_year <=2100),
 primary key (expense_id)
 );
-	
+
+CREATE TABLE postal_zone
+(postal_code	varchar(8),
+city			varchar(40),
+country			varchar(40),
+PRIMARY KEY(postal_code)
+);
+
 create table customer
 (cust_email		varchar(40),
 password		varchar(40),
@@ -17,10 +24,9 @@ expiry_year		numeric(4,0) check(expiry_year>=2000 and expiry_year <=2100),
 cvc_code		numeric(3,0) check(cvc_code>0),
 street_num		numeric(6,0),
 street_name		varchar(40),
-city			varchar(40),
-country			varchar(40),
-postal_code		varchar(6),
-primary key (cust_email)
+postal_code		varchar(8),
+primary key (cust_email),
+foreign key (postal_code) references postal_zone
 );
 
 create table publisher
@@ -29,10 +35,11 @@ street_num		numeric(6,0),
 street_name		varchar(40),
 city			varchar(40),
 country			varchar(40),
-postal_code		varchar(6),
+postal_code		varchar(8),
 pub_email		varchar(40),
 bank_acc		numeric(12,0),
-primary key (pub_email)
+primary key (pub_email),
+foreign key (postal_code) references postal_zone
 );
 
 create table phone
@@ -51,9 +58,11 @@ sysnopsis       	varchar(750),
 num_pages			int check(num_pages > 0),
 price				numeric(5,2) check(price>0),
 stock				int check(stock>0),
+pub_name			varchar(40),
 percent_of_sales	numeric(3,2) check(percent_of_sales>=0 and percent_of_sales <=1),
 legacy_item			boolean default FALSE,
-primary key (isbn)
+primary key (isbn),
+foreign key (pub_name) references publisher
 );
 
 create table author
@@ -81,17 +90,15 @@ purchase_month		int check(purchase_month>=1 and purchase_month<=12),
 purchase_year		int check(purchase_year>=2000 and purchase_year <=2100),
 bill_street_num		numeric(6,0),
 bill_street_name	varchar(40),
-bill_city			varchar(40),
-bill_country		varchar(40),
-bill_postal_code	varchar(6),
+bill_postal_code	varchar(8),
 ship_street_num		numeric(6,0),
 ship_street_name	varchar(40),
-ship_city			varchar(40),
-ship_country		varchar(40),
-ship_postal_code	varchar(6),
+ship_postal_code	varchar(8),
 cust_email			varchar(40),
 primary key (order_num),
-foreign key (cust_email) references customer
+foreign key (cust_email) references customer,
+foreign key (bill_postal_code) references postal_zone(postal_code),
+foreign key (ship_postal_code) references postal_zone(postal_code)
 );
 
 create table book_ordered
@@ -103,28 +110,28 @@ foreign key (isbn) references book,
 foreign key (order_num) references cust_order
 );
 
+
+--views
 create view monthly_sales as
-select purchase_year as year, purchase_month as month, sum(book.price*book_ordred.quantity) as sales
-from cust_order natural join  book_ordred natural join book
+select purchase_year as year, purchase_month as month, sum(book.price*book_ordered.quantity) as sales
+from cust_order natural join  book_ordered natural join book
 where status not in ('Cart')
 group by cust_order.purchase_month, cust_order.purchase_year;
 
 create view yearly_sales as
-select purchase_year as year, sum(book.price*book_ordred.quantity) as sales
-from cust_order natural join  book_ordred natural join book
+select purchase_year as year, sum(book.price*book_ordered.quantity) as sales
+from cust_order natural join  book_ordered natural join book
 where status not in ('Cart')
 group by cust_order.purchase_year;
 
 create view monthly_expense as
 select exp_year as year, exp_month as month, sum(amount) as expense
 from expense 
-where status not in ('Cart')
 group by exp_month, exp_year;
 
 create view yearly_expense as
 select exp_year as year, sum(amount) as expense
 from expense 
-where status not in ('Cart')
 group by exp_year;
 
 create view monthly_sales_vs_expense as
@@ -136,13 +143,18 @@ select *
 from yearly_sales natural join yearly_expense;
 
 create view sales_by_author as 
-select author_name, sum(book.price*book_ordred.quantity) as sales
-from book_ordred natural join book natural join author
+select author_name, sum(book.price*book_ordered.quantity) as sales
+from cust_order natural join book_ordered natural join book natural join author
 where status not in ('Cart')
 group by author.author_name;
 
 create view sales_by_genere as 
-select genere, sum(book.price*book_ordred.quantity) as sales
-from book_ordred natural join book
+select genere, sum(book.price*book_ordered.quantity) as sales
+from cust_order natural join book_ordered natural join book
 where status not in ('Cart')
-group by author.author_name;
+group by genere;
+
+CREATE VIEW books_in_carts AS
+SELECT order_num, quantity, isbn, stock
+FROM cust_order NATURAL JOIN book_ordered NATURAL JOIN book
+WHERE cust_order.status IN ('Cart')
