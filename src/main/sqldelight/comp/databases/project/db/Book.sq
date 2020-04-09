@@ -1,0 +1,15 @@
+CREATE TABLE book (
+    isbn				VARCHAR(17),
+    title				VARCHAR(60) NOT NULL,
+    genere				VARCHAR(40) NOT NULL,
+    cover_image			VARCHAR(60),
+    sysnopsis       	varchar(750),
+    num_pages			numeric(6,0) CHECK(num_pages > 0),
+    price				numeric(5,2) CHECK(price > 0),
+    stock				numeric(6,0) CHECK(stock > 0),
+    percent_of_sales	numeric(3,2) CHECK(percent_of_sales >= 0 AND percent_of_sales <= 1),
+    PRIMARY KEY (isbn)
+);
+
+select:
+SELECT * FROM book;
