@@ -46,12 +46,13 @@ create table book
 (isbn				varchar(17),
 title				varchar(60) not null,
 genere				varchar(40) not null,
-cover_image			bytea,
+cover_image			varchar(50),
 sysnopsis       	varchar(750),
-num_pages			numeric(6,0) check(num_pages > 0),
+num_pages			int check(num_pages > 0),
 price				numeric(5,2) check(price>0),
-stock				numeric(6,0) check(stock>0),
+stock				int check(stock>0),
 percent_of_sales	numeric(3,2) check(percent_of_sales>=0 and percent_of_sales <=1),
+legacy_item			boolean default FALSE,
 primary key (isbn)
 );
 
@@ -96,7 +97,7 @@ foreign key (cust_email) references customer
 create table book_ordered
 (order_num			int not null,
 isbn				varchar(17),
-quantity			numeric(4,0) check(quantity>=1),
+quantity			int check(quantity>=1),
 primary key (order_num,isbn),
 foreign key (isbn) references book,
 foreign key (order_num) references cust_order
