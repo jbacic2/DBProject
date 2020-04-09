@@ -44,10 +44,34 @@ create function make_order(order_num int)
 			where cust_order.order_num = make_order.order_num
 	end;
 	
-CREATE FUNCTION check_quantity_in_cart ()
+CREATE PROCEDURE check_quantity_in_cart ()
 	BEGIN 
 		FOR r IN
-			SELECT * FROM cust_order NATURAL JOIN 
+			SELECT * FROM cust_order NATURAL JOIN book_ordred NATURAL JOIN book
+			WHERE cust_order.status IN ('Cart')
+		LOOP
+			IF r.quantity > r.stock THEN
+				UPDATE book_ordred
+				SET quantity = r.stock 
+				WHERE order_num = r.order_num AND isbn=r.isbn
+			END IF;
+		END LOOP;
+		RETURN;
+	END; $$ LANGUAGE plpgsql;
+	
+CREATE PROCEDURE update_stock (order_num INT)
+	BEGIN
+		FOR r IN
+			SELECT * FROM book_ordred 
+			WHERE book_ordred.order_num = update_stock.order_num
+		LOOP
+			UPDATE book
+			SET stock = stock - r.quantity
+			WHERE book.isbn = r.isbn
+		END LOOP;
+	END; $$ LANGUAGE plpgsql;
+
+				
 
 /*create function monthly_sales (year int)
 	returns tabel (

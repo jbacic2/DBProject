@@ -1,4 +1,23 @@
-create trigger change_quantity_in_cart before update of quantity on book_ordered or insert on 
+CREATE TRIGGER change_quantity_in_cart AFTER UPDATE OF quantity ON book_ordered OR INSERT ON book_ordered
+	EXECUTE PROCEDURE check_quantity_in_cart ();
+
+CREATE TRIGGER update_order_status AFTER UPDATE OF status ON cust_order 
+	DECLARE books_in_stock INT;
+	REFERENCING NEW ROW AS nrow
+	REFERENCING OLD ROW AS orow
+	FOR EACH ROW 
+	WHEN(orow.status = 'Cart' AND nrow.status = 'Awaiting Fulfillment') 
+		EXECUTE PROCEDURE update_stock(nrow.order_num)
+		UPDATE cust_order
+			SET purchase_day = SELECT EXTRACT(DAY FROM DATE current_date);
+			SET purchase_month = SELECT EXTRACT(MONTH FROM DATE current_date);
+			SET purchase_year = SELECT EXTRACT(YEAR FROM DATE current_date);
+			WHERE cust_order.order_num = update_order_status.order_num
+	END LOOP;
+	EXECUTE PROCEDURE check_quantity_in_cart ();	
+
+
+/*create trigger change_quantity_in_cart before update of quantity on book_ordered or insert on 
 	declare books_in_stock int;
 	referencing new row as nrow
 	for each row 
@@ -8,7 +27,7 @@ create trigger change_quantity_in_cart before update of quantity on book_ordered
 		set nrow.quantity = books_in_stock
 	end
 
-//this would prevent ordering too much 
+
 create trigger change_quantity_in_cart after update of quantity on book_ordered or insert on 
 	declare books_in_stock int;
 	for each row 
@@ -19,3 +38,4 @@ create trigger change_quantity_in_cart after update of quantity on book_ordered 
 		set quantity = books_in_stock
 		when 
 	end
+*/
