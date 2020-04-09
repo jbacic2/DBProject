@@ -5,7 +5,7 @@ const webpack = require("webpack");
 module.exports = {
   mode: "development",
   resolve: {
-    extensions: [".ts", ".tsx", ".js"]
+    extensions: [".ts", ".tsx", ".js"],
   },
   entry: "./web/src/index.tsx",
   devtool: "inline-source-map",
@@ -14,7 +14,7 @@ module.exports = {
       {
         test: /\.ts(x?)$/,
         exclude: /node_modules/,
-        loader: "ts-loader"
+        loader: "ts-loader",
       },
       {
         enforce: "pre",
@@ -26,10 +26,12 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "dbproject.bundle.js",
+    publicPath: "/",
   },
   devServer: {
     contentBase: path.join(__dirname, "dist"),
     compress: true,
+    historyApiFallback: true,
     port: 9000,
   },
   plugins: [new HtmlWebpackPlugin({ template: "./web/src/index.html" })],
