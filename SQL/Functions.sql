@@ -31,18 +31,6 @@ create function check_date (day int, month int, year int)
 	return valid_date;
 	end; $$ language plpgsql;
 	
-create function make_order(order_num int)
-	returns tabel(
-		
-	)
-	begin atomic
-		update cust_order
-			set purchase_day = select extract(day from date current_date);
-			set purchase_month = select extract(month from date current_date);
-			set purchase_year = select extract(year from date current_date);
-			set status = 'Awaiting Fulfillment';
-			where cust_order.order_num = make_order.order_num
-	end;
 	
 CREATE PROCEDURE check_quantity_in_cart ()
 	BEGIN 
@@ -98,4 +86,18 @@ create function sales_by_auth (year int)
 		from cust_order natural join  book_ordred natural join book
 		group by cust_order.purchase_year, cust_order.purchase_month 
 		having cust_order.purchase_year = monthly_sales.year  
-	end; $$ language plpgsql;*/
+	end; $$ language plpgsql;
+	
+	
+	create function make_order(order_num int)
+	returns tabel(
+		
+	)
+	begin atomic
+		update cust_order
+			set purchase_day = select extract(day from date current_date);
+			set purchase_month = select extract(month from date current_date);
+			set purchase_year = select extract(year from date current_date);
+			set status = 'Awaiting Fulfillment';
+			where cust_order.order_num = make_order.order_num
+	end;*/
