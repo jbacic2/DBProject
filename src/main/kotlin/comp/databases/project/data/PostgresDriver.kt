@@ -6,5 +6,5 @@ import java.sql.DriverManager
 
 class PostgresDriver : JdbcDriver() {
     override fun getConnection(): Connection =
-        DriverManager.getConnection("jdbc:postgresql://localhost:5433/BookStore", "postgres", "postgres")
+        DriverManager.getConnection("jdbc:postgresql://localhost:8888/postgres", "postgres", "postgres")
 }

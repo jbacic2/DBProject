@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  database:
+    image: library/postgres:12
+    volumes:
+      - ./SQL:/docker-entrypoint-initdb.d/init.sql
+      - bookstore:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "8888:5432"
+volumes:
+  bookstore:
+    driver: local
