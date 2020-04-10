@@ -72,9 +72,9 @@ foreign key (isbn) references book
 
 create table restock_email
 (email_id		serial,
-day				int check(exp_day>0 and exp_day<=31),
-month			int check(exp_month>=1 and exp_month<=12),
-year			int check(exp_year>=2000 and exp_year <=2100),
+day				int check(day>0 and day<=31),
+month			int check(month>=1 and month<=12),
+year			int check(year>=2000 and year <=2100),
 isbn			varchar(17),
 primary key (email_id),
 foreign key (isbn) references book
