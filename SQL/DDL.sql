@@ -36,7 +36,7 @@ street_name		varchar(40),
 postal_code		varchar(8),
 pub_email		varchar(40),
 bank_acc		numeric(12,0),
-primary key (pub_email),
+primary key (pub_name),
 foreign key (postal_code) references postal_zone
 );
 
@@ -50,9 +50,9 @@ foreign key (pub_name) references publisher
 create table book
 (isbn				varchar(17),
 title				varchar(60) not null,
-genere				varchar(40) not null,
+genre				varchar(40) not null,
 cover_image			varchar(200),
-sysnopsis       	varchar(1000),
+synopsis       	varchar(1000),
 num_pages			int check(num_pages > 0),
 price				numeric(5,2) check(price>0),
 stock				int check(stock>0),
@@ -146,11 +146,11 @@ from cust_order natural join book_ordered natural join book natural join author
 where status not in ('Cart')
 group by author.author_name;
 
-create view sales_by_genere as 
-select genere, sum(book.price*book_ordered.quantity) as sales
+create view sales_by_genre as 
+select genre, sum(book.price*book_ordered.quantity) as sales
 from cust_order natural join book_ordered natural join book
 where status not in ('Cart')
-group by genere;
+group by genre;
 
 CREATE VIEW books_in_carts AS
 SELECT order_num, quantity, isbn, stock
