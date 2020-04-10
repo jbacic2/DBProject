@@ -1,4 +1,4 @@
-package comp.databases.project.data
+package comp.databases.project.shared.data
 
 import com.squareup.sqldelight.sqlite.driver.JdbcDriver
 import java.sql.Connection

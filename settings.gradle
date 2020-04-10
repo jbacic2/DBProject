@@ -1,2 +1,3 @@
 rootProject.name = 'DBProject'
 
+include "customer", "owner", "shared"

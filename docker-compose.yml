@@ -3,7 +3,7 @@ services:
   database:
     image: library/postgres:12
     volumes:
-      - ./SQL:/docker-entrypoint-initdb.d/init.sql
+      - ./SQL:/docker-entrypoint-initdb.d/
       - bookstore:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: "postgres"
