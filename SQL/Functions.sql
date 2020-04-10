@@ -61,14 +61,54 @@ CREATE FUNCTION check_date_order_tf ()
 	RETURN NEW;
 	END; $$ LANGUAGE plpgsql;
 
---Satement level trigger 
-CREATE FUNCTION check_quantity_in_cart_tf()
-	RETURNS TRIGGER AS $$
-	BEGIN
-		PERFORM check_quantity_in_cart();
-	RETURN NULL;
+-- this function will calcuate the number of books to be ordered which will be the number of books
+-- sold in the last month or be 10 if the number of books sold is less then 10
+CREATE FUNCTION calc_books_to_order (isbn varchar(17))
+	RETURNS INTEGER AS $$
+	DECLARE book_sum INTEGER;
+	DECLARE last_month INTEGER;
+	DECLARE last_month_year INTEGER;
+	BEGIN 
+		last_month = (CAST(SELECT EXTRACT(MONTH FROM DATE current_date) AS INTEGER))-1;
+		last_month_year = CAST (SELECT EXTRACT(YEAR FROM DATE current_date) AS INTEGER);
+		IF last_month = 0 THEN
+			last_month = 12;
+			last_month_year = last_month_year -1;
+		END IF;
+		SELECT SUM(quantity)
+		FROM cust_order natural join book_ordered AS orders
+		WHERE orders.isbn = calc_books_to_order.isbn, orders.purchase_month = last_month, orders.purchase_year = last_month_year INTO book_sum;
+		IF book_sum < 10 THEN
+			book_sum = 10;
+		END IF;
+	RETURN book_sum;
 	END; $$ LANGUAGE plpgsql;
-	
+
+--will order books if less then 10 in stock 
+CREATE FUNCTION restock_email_check() 
+  RETURNS VOID 
+AS
+$$
+DECLARE 
+	 r book%rowtype;
+BEGIN
+    FOR r in SELECT * 
+	FROM book
+	LOOP
+		IF r.stock < 10 THEN
+			INSERT INTO restock_email (day, month, year, isbn)
+			VALUES(CAST(SELECT EXTRACT(DAY FROM DATE current_date) AS INTEGER),CAST(SELECT EXTRACT(MONTH FROM DATE current_date) AS INTEGER),CAST(SELECT EXTRACT(YEAR FROM DATE current_date) AS INTEGER),r.isbn);
+			
+			UPDATE book
+			SET book.stock = book.stock + calc_books_to_order (r.isbn)
+			WHERE order_num = r.order_num AND book.isbn=r.isbn;
+		END IF;
+    END LOOP;
+END;
+$$ 
+LANGUAGE plpgsql;
+
+--used to make sure that a cart doesn't have more books then in stock 
 CREATE FUNCTION check_quantity_in_cart() 
   RETURNS VOID 
 AS
@@ -89,13 +129,41 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
+--Satement level trigger 
+CREATE FUNCTION check_quantity_in_cart_tf()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		PERFORM check_quantity_in_cart();
+	RETURN NULL;
+	END; $$ LANGUAGE plpgsql;
+	
 
+-- will add the rreduce the stock and if stock is less than 10 will send email 
+CREATE FUNCTION expense_royalties (order_num INT)
+  RETURNS VOID 
+AS
+$$
+DECLARE 
+	 royalties NUMERIC(9,2);
+BEGIN
+    SELECT SUM(price*percent_of_sales*quantity)
+	FROM book NATURAL JOIN book_ordered 
+	WHERE book_ordered.order_num = expense_royalties.order_num INTO royalties;
+	
+	INSERT INTO expense (type,amount,exp_day,exp_month,exp_year)
+	VALUES ('Royalties', royalties, CAST (SELECT EXTRACT(DAY FROM DATE current_date) AS INTEGER), CAST (SELECT EXTRACT(MONTH FROM DATE current_date) AS INTEGER), CAST (SELECT EXTRACT(YEAR FROM DATE current_date) AS INTEGER));
+END;
+$$ 
+LANGUAGE plpgsql;	
+
+-- will reduce the stock and if stock is less than 10 will send email 
 CREATE FUNCTION update_stock (order_num INT)
   RETURNS VOID 
 AS
 $$
 DECLARE 
 	 r book_ordered%rowtype;
+	 new_stock INTEGER;
 BEGIN
     FOR r in SELECT * 
 	FROM book_ordered
@@ -110,10 +178,28 @@ $$
 LANGUAGE plpgsql;
 
 
-CREATE FUNCTION change_quantity_in_cart_tf() 
+CREATE FUNCTION cart_ordered_tf() 
    RETURNS trigger AS
 $$
 BEGIN
+	WHEN(OLD.status = 'Cart' AND NEW.status = 'Awaiting Fulfillment') 
+		PERFORM update_stock(NEW.order_num);
+		PREFORM expense_royalties(NEW.order_num);
+		UPDATE cust_order
+			SET purchase_day = CAST (SELECT EXTRACT(DAY FROM DATE current_date) AS INTEGER), 
+			purchase_month = CAST (SELECT EXTRACT(MONTH FROM DATE current_date) AS INTEGER),
+			purchase_year = CAST (SELECT EXTRACT(YEAR FROM DATE current_date) AS INTEGER)
+			WHERE cust_order.order_num = update_order_status.order_num;
+	END LOOP;
+END;
+$$ 
+LANGUAGE plpgsql;
+
+CREATE FUNCTION change_in_stock_tf() 
+   RETURNS trigger AS
+$$
+BEGIN
+	PREFORM restock_email_check();
 	PERFORM check_quantity_in_cart();
 END;
 $$ 

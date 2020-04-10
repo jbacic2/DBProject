@@ -49,10 +49,10 @@ foreign key (pub_name) references publisher
 
 create table book
 (isbn				varchar(17),
-title				varchar(60) not null,
+title				varchar(100) not null,
 genre				varchar(40) not null,
 cover_image			varchar(200),
-synopsis       	varchar(1000),
+synopsis       		varchar(1000),
 num_pages			int check(num_pages > 0),
 price				numeric(5,2) check(price>0),
 stock				int check(stock>0),
@@ -155,4 +155,4 @@ group by genre;
 CREATE VIEW books_in_carts AS
 SELECT order_num, quantity, isbn, stock
 FROM cust_order NATURAL JOIN book_ordered NATURAL JOIN book
-WHERE cust_order.status IN ('Cart')
+WHERE cust_order.status IN ('Cart');
