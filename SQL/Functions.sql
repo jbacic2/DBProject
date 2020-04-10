@@ -26,18 +26,47 @@ create function check_date (day int, month int, year int)
 				valid_date = TRUE;
 			end if;
 		else
-			valid_date = TRUE;
+			if month <> 2 then 
+				valid_date = TRUE;
+			end if;
 		end if;
 	return valid_date;
 	end; $$ language plpgsql;
-	
-create function check_date_exp_tf ()
-	returns trigger as $$
-	begin
+
+--date checking trigger functions 
+CREATE FUNCTION check_date_exp_tf ()
+	RETURNS TRIGGER AS $$
+	BEGIN
 		IF NOT check_date(NEW.exp_day,NEW.exp_month,NEW.exp_year) THEN
 		RAISE EXCEPTION 'Invalid Date: %, %, % is not a real day', NEW.exp_day,NEW.exp_month,NEW.exp_year;
 		END IF;
 	RETURN NEW;
+	END; $$ LANGUAGE plpgsql;
+
+CREATE FUNCTION check_date_restock_tf ()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		IF NOT check_date(NEW.day,NEW.month,NEW.year) THEN
+		RAISE EXCEPTION 'Invalid Date: %, %, % is not a real day', NEW.exp_day,NEW.exp_month,NEW.exp_year;
+		END IF;
+	RETURN NEW;
+	END; $$ LANGUAGE plpgsql;
+	
+CREATE FUNCTION check_date_order_tf ()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		IF NOT check_date(NEW.purchase_day,NEW.purchase_month,NEW.purchase_year) THEN
+		RAISE EXCEPTION 'Invalid Date: %, %, % is not a real day', NEW.exp_day,NEW.exp_month,NEW.exp_year;
+		END IF;
+	RETURN NEW;
+	END; $$ LANGUAGE plpgsql;
+
+--Satement level trigger 
+CREATE FUNCTION check_quantity_in_cart_tf()
+	RETURNS TRIGGER AS $$
+	BEGIN
+		PERFORM check_quantity_in_cart();
+	RETURN NULL;
 	END; $$ LANGUAGE plpgsql;
 	
 CREATE FUNCTION check_quantity_in_cart() 
@@ -48,7 +77,7 @@ DECLARE
 	 r books_in_carts%rowtype;
 BEGIN
     FOR r in SELECT * 
-	FROM cart_book_quantity_info
+	FROM books_in_carts
 	LOOP
         IF r.quantity > r.stock THEN
 				UPDATE book_ordred

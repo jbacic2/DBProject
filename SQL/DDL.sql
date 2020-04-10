@@ -33,8 +33,6 @@ create table publisher
 (pub_name		varchar(40),
 street_num		numeric(6,0),
 street_name		varchar(40),
-city			varchar(40),
-country			varchar(40),
 postal_code		varchar(8),
 pub_email		varchar(40),
 bank_acc		numeric(12,0),
@@ -53,8 +51,8 @@ create table book
 (isbn				varchar(17),
 title				varchar(60) not null,
 genere				varchar(40) not null,
-cover_image			varchar(50),
-sysnopsis       	varchar(750),
+cover_image			varchar(200),
+sysnopsis       	varchar(1000),
 num_pages			int check(num_pages > 0),
 price				numeric(5,2) check(price>0),
 stock				int check(stock>0),
@@ -74,9 +72,9 @@ foreign key (isbn) references book
 
 create table restock_email
 (email_id		serial,
-exp_day			int check(exp_day>0 and exp_day<=31),
-exp_month		int check(exp_month>=1 and exp_month<=12),
-exp_year		int check(exp_year>=2000 and exp_year <=2100),
+day				int check(exp_day>0 and exp_day<=31),
+month			int check(exp_month>=1 and exp_month<=12),
+year			int check(exp_year>=2000 and exp_year <=2100),
 isbn			varchar(17),
 primary key (email_id),
 foreign key (isbn) references book
@@ -84,7 +82,7 @@ foreign key (isbn) references book
 
 create table cust_order
 (order_num			serial,
-status				varchar(20) check (status in ('Cart', 'Awaiting Fulfillment', 'Awaiting Shipment', 'En Route', 'Delivered')),
+status				varchar(20) check (status in ('Cart', 'Awaiting Fulfillment', 'Awaiting Shipment', 'En Route', 'Delivered')) default  'Cart' not null,
 purchase_day		int check(purchase_day>0 and purchase_day<=31),
 purchase_month		int check(purchase_month>=1 and purchase_month<=12),
 purchase_year		int check(purchase_year>=2000 and purchase_year <=2100),

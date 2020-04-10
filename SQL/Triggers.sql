@@ -1,9 +1,40 @@
 --This will make sure that no cart is holding more books than in stock when adding to cart
-CREATE TRIGGER change_quantity_in_cart AFTER UPDATE OF quantity ON book_ordered 
-	EXECUTE PROCEDURE change_quantity_in_cart_tf;
+CREATE TRIGGER check_quantity_in_cart_update AFTER UPDATE OF quantity ON book_ordered 
+	EXECUTE PROCEDURE check_quantity_in_cart_tf();
 
-CREATE TRIGGER change_quantity_in_cart AFTER INSERT ON book_ordered
-	EXECUTE PROCEDURE check_quantity_in_cart();
+CREATE TRIGGER change_quantity_in_cart_insert AFTER INSERT ON book_ordered
+	EXECUTE PROCEDURE check_quantity_in_cart_tf();
+	
+--date checking expense
+CREATE TRIGGER check_date_exp_update AFTER UPDATE ON expense
+	FOR EACH ROW
+	EXECUTE PROCEDURE check_date_exp_tf();
+	
+CREATE TRIGGER check_date_exp_insert AFTER INSERT ON expense 
+	FOR EACH ROW
+	EXECUTE PROCEDURE check_date_exp_tf();
+
+--date checking restock_email
+CREATE TRIGGER check_date_restock_update AFTER UPDATE ON restock_email
+	FOR EACH ROW
+	EXECUTE PROCEDURE check_date_restock_tf();
+	
+CREATE TRIGGER check_date_restock_insert AFTER INSERT ON restock_email
+	FOR EACH ROW
+	EXECUTE PROCEDURE check_date_restock_tf();
+
+--date checking cust_order
+CREATE TRIGGER check_date_order_update AFTER UPDATE of restock_email ON cust_order
+	FOR EACH ROW
+	EXECUTE PROCEDURE check_date_order_tf();
+	
+CREATE TRIGGER check_date_order_insert AFTER INSERT ON cust_order
+	FOR EACH ROW
+	EXECUTE PROCEDURE check_date_order_tf();
+
+
+
+
 
 --makes sure that only valid days are entered 
 CREATE TRIGGER change_quantity_in_cart AFTER UPDATE OF restock_email 
