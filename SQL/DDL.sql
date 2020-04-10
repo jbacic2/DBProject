@@ -49,10 +49,10 @@ foreign key (pub_name) references publisher
 
 create table book
 (isbn				varchar(17),
-title				varchar(100) not null,
+title				text not null,
 genre				varchar(40) not null,
 cover_image			varchar(200),
-synopsis       		varchar(1000),
+synopsis       	    text,
 num_pages			int check(num_pages > 0),
 price				numeric(5,2) check(price>0),
 stock				int check(stock>0),
@@ -64,7 +64,7 @@ foreign key (pub_name) references publisher
 );
 
 create table author
-(author_name		varchar(40),
+(author_name		text,
 isbn				varchar(17),
 primary key (author_name, isbn),
 foreign key (isbn) references book

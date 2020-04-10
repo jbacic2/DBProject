@@ -3,10 +3,15 @@ package comp.databases.project.customer
 import comp.databases.project.customer.auth.control.LoginControl
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.DummyAuthManager
+import comp.databases.project.db.BookDatabase
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
+import comp.databases.project.shared.data.PostgresDriver
 
-class CustomerControl(val authManager: AuthManager) : Control(View()) {
+class CustomerControl(
+    private val authManager: AuthManager,
+    private val database: BookDatabase
+) : Control(View()) {
     override fun onCommand(args: List<String>): Boolean {
         return when (args[0]) {
             "sound" -> {
@@ -45,12 +50,14 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
         """.trimIndent()
         )
         view.println("\nThe most popular book store this side of the Coronavirus Pandemic.")
-        view.println("""
+        view.println(
+            """
             Popular commands:
             * login  | Sign in to your account
             * search | Search for your favourite book
             * help   | View all commands
-        """.trimIndent())
+        """.trimIndent()
+        )
         view.print("\n\n\n")
     }
 
@@ -60,6 +67,5 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
 }
 
 fun main() {
-    val control = CustomerControl(DummyAuthManager)
-    control.run()
+    CustomerControl(DummyAuthManager, BookDatabase(PostgresDriver())).run()
 }
