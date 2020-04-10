@@ -4,7 +4,7 @@ import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
 
 class CustomerControl : Control(View()) {
-    override fun executeCommand(args: List<String>): Boolean {
+    override fun onCommand(args: List<String>): Boolean {
         return when (args[0]) {
             "sound" -> {
                 println("Woof")

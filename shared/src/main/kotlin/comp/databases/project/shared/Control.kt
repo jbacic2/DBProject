@@ -2,7 +2,7 @@ package comp.databases.project.shared
 
 import kotlin.system.exitProcess
 
-abstract class Control(private val view: View) {
+abstract class Control(protected val view: View) {
     protected open var promptUser: String = ""
 
     fun run() {
@@ -24,13 +24,13 @@ abstract class Control(private val view: View) {
         if (args.size == 1 && args[0] == "exit") {
             quit()
         } else if (args.isNotEmpty() && args[0].isNotBlank()) {
-            if (!executeCommand(args)) {
+            if (!onCommand(args)) {
                 println("Unknown command: ${args[0]}")
             }
         }
     }
 
-    protected abstract fun executeCommand(args: List<String>): Boolean
+    protected abstract fun onCommand(args: List<String>): Boolean
 
     protected open fun onInitialize() {}
     protected open fun onQuit() {}
