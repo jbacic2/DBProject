@@ -1,11 +1,12 @@
 package comp.databases.project.customer
 
 import comp.databases.project.customer.auth.control.LoginControl
+import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.DummyAuthManager
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
 
-class CustomerControl : Control(View()) {
+class CustomerControl(val authManager: AuthManager) : Control(View()) {
     override fun onCommand(args: List<String>): Boolean {
         return when (args[0]) {
             "sound" -> {
@@ -13,7 +14,16 @@ class CustomerControl : Control(View()) {
                 true
             }
             "login" -> {
-                LoginControl(DummyAuthManager, view).run()
+                LoginControl(authManager, view).run()
+                if (authManager.isAuthenticated) {
+                    promptUser = authManager.customer!!.email
+                }
+                true
+            }
+            "logout" -> {
+                authManager.logout()
+                promptUser = ""
+                view.println("Logged out.")
                 true
             }
             else -> false
@@ -50,6 +60,6 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
 }
 
 fun main() {
-    val control = CustomerControl()
+    val control = CustomerControl(DummyAuthManager)
     control.run()
 }

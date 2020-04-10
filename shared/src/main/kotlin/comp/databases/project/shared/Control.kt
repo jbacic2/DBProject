@@ -6,7 +6,6 @@ abstract class Control(protected val view: View) {
     protected open var promptUser: String = ""
     private var _run = true
 
-
     fun run() {
         onInitialize()
         while (_run) {
