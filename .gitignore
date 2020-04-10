@@ -1,8 +1,6 @@
 .gradle
 .idea
 /build
-/bin
-/node_modules
-.classpath
-.project
-.settings
+/customer/build
+/shared/build
+/owner/build
