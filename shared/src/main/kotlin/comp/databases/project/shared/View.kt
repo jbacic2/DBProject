@@ -12,4 +12,11 @@ class View(var prompt: String = ">") {
         return readLine()?.split(" ")
     }
 
+    fun print(text: String) {
+        kotlin.io.print(text)
+    }
+
+    fun println(text: String) {
+        kotlin.io.println(text)
+    }
 }
