@@ -98,11 +98,11 @@ INSERT INTO cust_order
 VALUES (3, 'Delivered', 9, 3, 2020, 1125, 'Colonel By Dr,', 'K1S 5B6', 1125, 'Colonel By Dr,', 'K1S 5B6', 'carl@cmail.ca');
 
 INSERT INTO cust_order 
-VALUES (3, 'En Route', 1, 4, 2020, 1125, 'Colonel By Dr,', 'K1S 5B6', 1125, 'Colonel By Dr,', 'K1S 5B6', 'carl@cmail.ca');
+VALUES (4, 'En Route', 1, 4, 2020, 1125, 'Colonel By Dr,', 'K1S 5B6', 1125, 'Colonel By Dr,', 'K1S 5B6', 'carl@cmail.ca');
 
 
-INSERT INTO cust_order (cust_email)
-VALUES ('someone@hello.com');
+INSERT INTO cust_order (order_num, cust_email)
+VALUES (5, 'someone@hello.com');
 
 INSERT INTO book_ordered
 values (1, '0-7475-3269-9', 2);
