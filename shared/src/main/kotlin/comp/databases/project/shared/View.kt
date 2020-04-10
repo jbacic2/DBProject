@@ -1,6 +1,9 @@
 package comp.databases.project.shared
 
-class View(var prompt: String = ">") {
+import java.io.Console
+import java.io.IOException
+
+class View(var prompt: String = "> ") {
     private val defaultPrompt = prompt
 
     fun resetPrompt() {
@@ -8,7 +11,7 @@ class View(var prompt: String = ">") {
     }
 
     fun prompt(user: String = ""): List<String>? {
-        print("$user$prompt ")
+        print("$user$prompt")
         return readLine()?.split(" ")
     }
 
@@ -18,5 +21,13 @@ class View(var prompt: String = ">") {
 
     fun println(text: String) {
         kotlin.io.println(text)
+    }
+
+    fun readPassword(): String? {
+        return try {
+            System.console().readPassword().joinToString()
+        } catch (e: IOException) {
+            null
+        }
     }
 }

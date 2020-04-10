@@ -1,5 +1,7 @@
 package comp.databases.project.customer
 
+import comp.databases.project.customer.auth.control.LoginControl
+import comp.databases.project.customer.auth.data.DummyAuthManager
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
 
@@ -8,6 +10,10 @@ class CustomerControl : Control(View()) {
         return when (args[0]) {
             "sound" -> {
                 println("Woof")
+                true
+            }
+            "login" -> {
+                LoginControl(DummyAuthManager, view).run()
                 true
             }
             else -> false
