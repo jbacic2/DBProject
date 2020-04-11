@@ -3,19 +3,19 @@ package comp.databases.project.customer
 import comp.databases.project.customer.auth.control.LoginControl
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.DummyAuthManager
-import comp.databases.project.db.BookDatabase
+import comp.databases.project.customer.books.data.DummyRepository
+import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
-import comp.databases.project.shared.data.PostgresDriver
 
 class CustomerControl(
     private val authManager: AuthManager,
-    private val database: BookDatabase
+    private val storefrontRepository: StorefrontRepository
 ) : Control(View()) {
     override fun onCommand(args: List<String>): Boolean {
         return when (args[0]) {
             "sound" -> {
-                println("Woof")
+                view.println("Woof")
                 true
             }
             "login" -> {
@@ -58,7 +58,12 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
             * help   | View all commands
         """.trimIndent()
         )
-        view.print("\n\n\n")
+        view.print("\n\n")
+        view.println("Here are some recommended books:")
+        storefrontRepository.getSuggestedBooks(5).forEachIndexed { index, (_, title) ->
+            view.println("${index + 1}. $title")
+        }
+        view.print("\n\n")
     }
 
     override fun onQuit() {
@@ -67,5 +72,5 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
 }
 
 fun main() {
-    CustomerControl(DummyAuthManager, BookDatabase(PostgresDriver())).run()
+    CustomerControl(DummyAuthManager, DummyRepository).run()
 }

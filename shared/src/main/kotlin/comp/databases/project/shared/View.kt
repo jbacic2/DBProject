@@ -1,9 +1,8 @@
 package comp.databases.project.shared
 
-import java.io.Console
 import java.io.IOException
 
-class View(var prompt: String = "> ") {
+open class View(var prompt: String = "> ") {
     private val defaultPrompt = prompt
 
     fun resetPrompt() {
