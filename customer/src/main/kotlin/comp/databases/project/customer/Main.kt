@@ -74,7 +74,6 @@ class CustomerControl(
                     promptUser = authManager.customer!!.email
                 }
                 true
-                true
             }
             "help" -> {
                 printHelp()
