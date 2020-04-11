@@ -1,5 +1,7 @@
 package comp.databases.project.customer.auth.data
 
+import comp.databases.project.shared.books.data.Customer
+
 interface AuthManager {
     val customer: Customer?
 

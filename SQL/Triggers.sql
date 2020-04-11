@@ -5,7 +5,7 @@ CREATE TRIGGER check_quantity_in_cart_update AFTER UPDATE OF quantity ON book_or
 CREATE TRIGGER change_quantity_in_cart_insert AFTER INSERT ON book_ordered
 	EXECUTE PROCEDURE check_quantity_in_cart_tf();
 	
---When book stock changes make sure the the quantity is cart is slow 
+--When book stock changes make sure the the quantity is cart is ok
 CREATE TRIGGER change_in_stock AFTER UPDATE OF stock ON book
 	EXECUTE PROCEDURE change_in_stock_tf();
 	
@@ -44,7 +44,7 @@ CREATE TRIGGER check_date_order_insert AFTER INSERT ON cust_order
 
 
 
-
+/*
 --makes sure that only valid days are entered 
 CREATE TRIGGER change_quantity_in_cart AFTER UPDATE OF restock_email 
 	FOR EACH ROW 
