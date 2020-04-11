@@ -1,6 +1,7 @@
 package comp.databases.project.customer
 
 import com.jakewharton.picnic.table
+import comp.databases.project.customer.auth.control.addUserOperation
 import comp.databases.project.customer.auth.control.loginOperation
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.RealAuthManager
@@ -67,9 +68,13 @@ class CustomerControl(
                 true
             }
             "addNewUser" -> {
-                // To do
-		true
-	    }
+                addUserOperation(authManager)
+                if (authManager.isAuthenticated) {
+                    promptUser = authManager.customer!!.email
+                }
+                true
+                true
+            }
             "help" -> {
                 printHelp()
                 true

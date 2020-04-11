@@ -1,4 +1,5 @@
 package comp.databases.project.shared.books.data
+import java.lang.Exception
 import java.math.BigDecimal
 import java.sql.*;
 import java.util.*;
@@ -79,10 +80,16 @@ object BookDatabase {
         postal_stmt.setString(1, postal_code);
         postal_stmt.setString(2, city);
         postal_stmt.setString(3, country);
-        postal_stmt.executeUpdate();
 
+        try {
+            postal_stmt.executeUpdate();
+        }
+        catch(e: Exception) {
+            println("Error with postal code")
+            return null
+        }
 
-        val cust_stmt = connection.prepareStatement("INSERT INTO customer VALUES (CAST(? AS VARCHAR(40), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(20)), CAST(? AS INT), CAST(? AS INT), CAST(? AS INT), CAST(? AS VARCHAR(20)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(8)))");
+        val cust_stmt = connection.prepareStatement("INSERT INTO customer VALUES (CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(20)), CAST(? AS INT), CAST(? AS INT), CAST(? AS INT), CAST(? AS VARCHAR(20)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(8)))");
 
         cust_stmt.setString(1, email);
         cust_stmt.setString(2, password);
@@ -94,7 +101,13 @@ object BookDatabase {
         cust_stmt.setString(8, street_name);
         cust_stmt.setString(9, postal_code);
 
-        cust_stmt.executeUpdate();
+        try {
+            cust_stmt.executeUpdate();
+        }
+        catch(e: Exception) {
+            println("Error with new user info")
+            return null
+        }
 
         return Customer(
             email,
