@@ -8,6 +8,9 @@ import comp.databases.project.customer.books.data.DummyRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.books.view.printBookDetail
 import comp.databases.project.customer.books.view.printSearchResults
+import comp.databases.project.customer.cart.addOperation
+import comp.databases.project.customer.cart.removeOperation
+import comp.databases.project.customer.data.StoreViewState
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
 
@@ -15,6 +18,8 @@ class CustomerControl(
     private val authManager: AuthManager,
     private val storefrontRepository: StorefrontRepository
 ) : Control(View()) {
+    private var viewState: StoreViewState = StoreViewState.NoView
+
     override fun onCommand(args: List<String>): Boolean {
         return when (args[0]) {
             "sound" -> {
@@ -24,11 +29,26 @@ class CustomerControl(
             "search" -> {
                 val books = storefrontRepository.searchBooks(args.subList(1, args.size).joinToString(separator = " "))
                 view.printSearchResults(books)
+                viewState = StoreViewState.SearchResultsView(books)
                 true
             }
             "view" -> {
-                val detail = storefrontRepository.getBookDetail("0-7475-3849-2")
-                view.printBookDetail(detail!!)
+                val detail = storefrontRepository.getBookDetail("0-7475-3849-2")!!
+                view.printBookDetail(detail)
+                viewState = StoreViewState.DetailView(detail)
+                true
+            }
+            "add" -> {
+                addOperation(storefrontRepository, viewState, args.getOrNull(1)?.toIntOrNull() ?: -1)
+                true
+            }
+            "remove" -> {
+                removeOperation(storefrontRepository, viewState, args.getOrNull(1)?.toIntOrNull() ?: -1)
+                true
+            }
+            "cart" -> {
+                view.println("TODO: Print Cart here")
+                viewState = StoreViewState.CartView(storefrontRepository.getCart().items)
                 true
             }
             "login" -> {
@@ -68,7 +88,7 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
             Popular commands:
             * login             | Sign in to your account
             * search <query>    | Search for your favourite book
-            * view <item>       | View details about a search result
+            * view <#ID>       | View details about a search result
             * help              | View all commands
         """.trimIndent()
         )
