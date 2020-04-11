@@ -5,6 +5,7 @@ import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
 import comp.databases.project.shared.cart.model.Cart
+import comp.databases.project.shared.cart.model.Order
 
 private val dummyBooks = listOf(
     BookDetail(
@@ -87,7 +88,7 @@ object DummyRepository : StorefrontRepository {
 
     override fun getCart(): Cart? = cart
 
-    override fun submitOrder(address: Address?): Boolean {
-        return true
+    override fun submitOrder(address: Address?): Order? {
+        return null
     }
 }

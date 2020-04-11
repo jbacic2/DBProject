@@ -57,7 +57,7 @@ class CustomerControl(
                 true
             }
             "order" -> {
-                if (placeOrder(storefrontRepository)) {
+                if (placeOrder(storefrontRepository) != null) {
                     view.println("Order placed.")
                 } else {
                     view.printerrln("Failed to place order.")

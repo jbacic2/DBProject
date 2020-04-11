@@ -4,6 +4,7 @@ import comp.databases.project.shared.books.data.Address
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
 import comp.databases.project.shared.cart.model.Cart
+import comp.databases.project.shared.cart.model.Order
 
 interface StorefrontRepository {
     fun getSuggestedBooks(count: Int): List<Book>
@@ -20,5 +21,5 @@ interface StorefrontRepository {
 
     fun getCart(): Cart?
 
-    fun submitOrder(address: Address? = null): Boolean
+    fun submitOrder(address: Address? = null): Order?
 }
