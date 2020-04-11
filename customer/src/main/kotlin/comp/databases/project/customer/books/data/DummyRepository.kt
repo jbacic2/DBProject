@@ -56,12 +56,23 @@ object DummyRepository : StorefrontRepository {
     override fun getBookDetail(isbn: String): BookDetail? = dummyBooks.find { (book) -> book.isbn == isbn }
 
     override fun addToCart(isbn: String, quantity: Long): Boolean {
-        cart = cart?.copy(
-            items = cart!!.items + Cart.Item(
-                Book(isbn, "", "", null, null, 5, 5.0, 4, "", 0.0, false),
-                quantity
+        if (cart != null) {
+            cart = cart?.copy(
+                items = cart!!.items + Cart.Item(
+                    dummyBooks.map { (book) -> book }.find { it.isbn == isbn }!!,
+                    quantity
+                )
             )
-        )
+        } else {
+            cart = Cart(
+                5L, listOf(
+                    Cart.Item(
+                        dummyBooks.map { (book) -> book }.find { it.isbn == isbn }!!,
+                        quantity
+                    )
+                )
+            )
+        }
         return true
     }
 
