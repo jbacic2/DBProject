@@ -5,6 +5,7 @@ import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.DummyAuthManager
 import comp.databases.project.customer.books.data.DummyRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
+import comp.databases.project.customer.books.view.printBookDetail
 import comp.databases.project.customer.books.view.printSearchResults
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
@@ -22,6 +23,11 @@ class CustomerControl(
             "search" -> {
                 val books = storefrontRepository.searchBooks(args.subList(1, args.size).joinToString(separator = " "))
                 view.printSearchResults(books)
+                true
+            }
+            "view" -> {
+                val detail = storefrontRepository.getBookDetail("0-7475-3849-2")
+                view.printBookDetail(detail!!)
                 true
             }
             "login" -> {
