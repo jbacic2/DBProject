@@ -17,5 +17,5 @@ interface StorefrontRepository {
 
     fun updateCartItem(isbn: String, quantity: Int)
 
-    fun getCart(): Cart
+    fun getCart(): Cart?
 }

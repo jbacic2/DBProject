@@ -46,7 +46,7 @@ private val dummyBooks = listOf(
     )
 )
 
-private var cart = Cart(1L, emptyList())
+private var cart: Cart? = null
 
 object DummyRepository : StorefrontRepository {
     override fun getSuggestedBooks(count: Int): List<Book> = dummyBooks.map { (book) -> book }
@@ -56,8 +56,8 @@ object DummyRepository : StorefrontRepository {
     override fun getBookDetail(isbn: String): BookDetail? = dummyBooks.find { (book) -> book.isbn == isbn }
 
     override fun addToCart(isbn: String, quantity: Long): Boolean {
-        cart = cart.copy(
-            items = cart.items + Cart.Item(
+        cart = cart?.copy(
+            items = cart!!.items + Cart.Item(
                 Book(isbn, "", "", null, null, 5, 5.0, 4, "", 0.0, false),
                 quantity
             )
@@ -73,5 +73,5 @@ object DummyRepository : StorefrontRepository {
         TODO("Not yet implemented")
     }
 
-    override fun getCart(): Cart = cart
+    override fun getCart(): Cart? = cart
 }

@@ -48,7 +48,9 @@ class CustomerControl(
             }
             "cart" -> {
                 view.println("TODO: Print Cart here")
-                viewState = StoreViewState.CartView(storefrontRepository.getCart().items)
+                storefrontRepository.getCart()?.let { (_, items) ->
+                    viewState = StoreViewState.CartView(items)
+                }
                 true
             }
             "login" -> {
