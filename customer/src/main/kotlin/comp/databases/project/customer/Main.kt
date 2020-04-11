@@ -5,6 +5,7 @@ import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.DummyAuthManager
 import comp.databases.project.customer.books.data.DummyRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
+import comp.databases.project.customer.books.view.printSearchResults
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
 
@@ -16,6 +17,11 @@ class CustomerControl(
         return when (args[0]) {
             "sound" -> {
                 view.println("Woof")
+                true
+            }
+            "search" -> {
+                val books = storefrontRepository.searchBooks(args.subList(1, args.size).joinToString(separator = " "))
+                view.printSearchResults(books)
                 true
             }
             "login" -> {
@@ -53,9 +59,10 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
         view.println(
             """
             Popular commands:
-            * login  | Sign in to your account
-            * search | Search for your favourite book
-            * help   | View all commands
+            * login             | Sign in to your account
+            * search <query>    | Search for your favourite book
+            * view <item>       | View details about a search result
+            * help              | View all commands
         """.trimIndent()
         )
         view.print("\n\n")
