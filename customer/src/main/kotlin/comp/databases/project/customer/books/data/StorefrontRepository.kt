@@ -2,6 +2,7 @@ package comp.databases.project.customer.books.data
 
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
+import comp.databases.project.shared.cart.model.Cart
 
 interface StorefrontRepository {
     fun getSuggestedBooks(count: Int): List<Book>
@@ -10,5 +11,11 @@ interface StorefrontRepository {
 
     fun getBookDetail(isbn: String): BookDetail?
 
-    fun addToCart(isbn: String, amount: Int = 1): Boolean
+    fun addToCart(isbn: String, quantity: Long = 1): Boolean
+
+    fun removeFromCart(isbn: String): Boolean
+
+    fun updateCartItem(isbn: String, quantity: Int)
+
+    fun getCart(): Cart?
 }

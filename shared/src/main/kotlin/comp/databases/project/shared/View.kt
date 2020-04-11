@@ -14,12 +14,21 @@ open class View(var prompt: String = "> ") {
         return readLine()?.split(" ")
     }
 
-    fun print(text: String) {
-        kotlin.io.print(text)
+    fun print(value: Any?) {
+        kotlin.io.print(value?.toString())
     }
 
-    fun println(text: String) {
-        kotlin.io.println(text)
+    fun println(value: Any?) {
+        kotlin.io.println(value?.toString())
+    }
+
+    fun printerr(value: Any?) {
+        print(value?.toString())
+    }
+
+    fun printerrln(value: Any?) {
+        // TODO: Print in red
+        println(value?.toString())
     }
 
     fun readPassword(): String? {

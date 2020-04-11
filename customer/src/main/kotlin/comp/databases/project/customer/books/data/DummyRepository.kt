@@ -3,6 +3,7 @@ package comp.databases.project.customer.books.data
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
+import comp.databases.project.shared.cart.model.Cart
 
 private val dummyBooks = listOf(
     BookDetail(
@@ -35,9 +36,17 @@ private val dummyBooks = listOf(
             0.10,
             false
         ),
-        listOf(Author("J. K. Rowling", "0-7475-3849-2"), Author("J. K. Rowling", "0-7475-3849-2"), Author("J. K. Rowling", "0-7475-3849-2"), Author("J. K. Rowling", "0-7475-3849-2"), Author("J. K. Rowling", "0-7475-3849-2"))
+        listOf(
+            Author("J. K. Rowling", "0-7475-3849-2"),
+            Author("J. K. Rowling", "0-7475-3849-2"),
+            Author("J. K. Rowling", "0-7475-3849-2"),
+            Author("J. K. Rowling", "0-7475-3849-2"),
+            Author("J. K. Rowling", "0-7475-3849-2")
+        )
     )
 )
+
+private var cart: Cart? = null
 
 object DummyRepository : StorefrontRepository {
     override fun getSuggestedBooks(count: Int): List<Book> = dummyBooks.map { (book) -> book }
@@ -46,7 +55,23 @@ object DummyRepository : StorefrontRepository {
 
     override fun getBookDetail(isbn: String): BookDetail? = dummyBooks.find { (book) -> book.isbn == isbn }
 
-    override fun addToCart(isbn: String, amount: Int): Boolean {
+    override fun addToCart(isbn: String, quantity: Long): Boolean {
+        cart = cart?.copy(
+            items = cart!!.items + Cart.Item(
+                Book(isbn, "", "", null, null, 5, 5.0, 4, "", 0.0, false),
+                quantity
+            )
+        )
+        return true
+    }
+
+    override fun removeFromCart(isbn: String): Boolean {
+        return true
+    }
+
+    override fun updateCartItem(isbn: String, quantity: Int) {
         TODO("Not yet implemented")
     }
+
+    override fun getCart(): Cart? = cart
 }

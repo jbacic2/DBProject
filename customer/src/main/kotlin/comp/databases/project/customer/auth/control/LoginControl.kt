@@ -16,10 +16,10 @@ fun Control.loginOperation(authManager: AuthManager) {
         if (authManager.authenticate(email, password ?: "")) {
             return
         } else {
-            view.println("Wrong email or password.\n")
+            view.printerrln("Wrong email or password.\n")
             attempts++
         }
     }
 
-    view.println("Unable to log in.\n")
+    view.printerrln("Unable to log in.\n")
 }

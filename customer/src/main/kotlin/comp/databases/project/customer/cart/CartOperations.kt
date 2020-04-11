@@ -1,0 +1,74 @@
+package comp.databases.project.customer.cart
+
+import comp.databases.project.customer.books.data.StorefrontRepository
+import comp.databases.project.customer.data.StoreViewState
+import comp.databases.project.shared.Control
+
+private fun checkId(id: Int, list: List<*>): Boolean = id < list.size && id >= 0
+
+fun Control.addOperation(repository: StorefrontRepository, viewState: StoreViewState, id: Int = -1) {
+
+    if (viewState is StoreViewState.NoView ||
+        id < 0 && viewState !is StoreViewState.DetailView
+    ) {
+        view.printerrln("No product to add.")
+        return
+    }
+
+    if ((viewState is StoreViewState.SearchResultsView && !checkId(id, viewState.books)) ||
+        viewState is StoreViewState.CartView && !checkId(id, viewState.items)
+    ) {
+        view.printerrln("Invalid item #ID.")
+        return
+    }
+
+    view.print("Enter quantity: ")
+    val quantity = view.readLine()?.toLongOrNull()
+    if (quantity == null || quantity < 1) {
+        view.printerrln("Invalid quantity.")
+        return
+    }
+
+    val item = when (viewState) {
+        StoreViewState.NoView -> throw IllegalStateException()
+        is StoreViewState.DetailView -> viewState.book.detail.isbn
+        is StoreViewState.SearchResultsView -> viewState.books[id].isbn
+        is StoreViewState.CartView -> TODO()
+    }
+
+    if (!repository.addToCart(item, quantity)) {
+        when (quantity) {
+            1L -> view.printerrln("Couldn't add item to cart.")
+            else -> view.printerrln("Couldn't add items to cart.")
+        }
+    } else {
+        when (quantity) {
+            1L -> view.println("Added item to cart.")
+            else -> view.println("Added items to cart.")
+        }
+    }
+}
+
+fun Control.removeOperation(repository: StorefrontRepository, viewState: StoreViewState, id: Int = -1) {
+    if (viewState !is StoreViewState.CartView) {
+        view.printerrln("Cannot remove item from card when not viewing cart. Run [cart] to view cart.")
+        return
+    }
+
+    if (!checkId(id, viewState.items)) {
+        view.printerrln("Invalid item #ID for cart.")
+        return
+    }
+
+    if (repository.removeFromCart(viewState.items[id].book.isbn)) {
+        when (viewState.items[id].quantity) {
+            1L -> view.println("Removed item from cart.")
+            else -> view.println("Removed items from cart.")
+        }
+    } else {
+        when (viewState.items[id].quantity) {
+            1L -> view.printerrln("Could not remove item from cart.")
+            else -> view.printerrln("Could not remove items from cart.")
+        }
+    }
+}
