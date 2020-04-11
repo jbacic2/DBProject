@@ -1,4 +1,5 @@
 package comp.databases.project.shared.books.data
+import java.math.BigDecimal
 import java.sql.*;
 import java.util.*;
 
@@ -13,11 +14,11 @@ object BookDatabase {
 
     fun authenticate(email: String, password: String): Customer? {
         val cust_password: String;
-        val card_num: Int;
+        val card_num: String;
         val expiry_month: Int;
         val expiry_year: Int;
         val cvc_code: Int;
-        val street_num: Float;
+        val street_num: String;
         val street_name: String;
         val postal_code: String;
         val pstmt = connection.prepareStatement("SELECT * FROM customer WHERE cust_email = CAST(? AS VARCHAR(40))");
@@ -26,11 +27,11 @@ object BookDatabase {
         resSet = pstmt.executeQuery();
         if (resSet.next()) {
             cust_password = resSet.getString(2);
-            card_num = resSet.getInt(3);
+            card_num = resSet.getString(3);
             expiry_month = resSet.getInt(4);
             expiry_year = resSet.getInt(5);
             cvc_code = resSet.getInt(6);
-            street_num = resSet.getFloat(7);
+            street_num = resSet.getString(7);
             street_name = resSet.getString(8);
             postal_code = resSet.getString(9);
 

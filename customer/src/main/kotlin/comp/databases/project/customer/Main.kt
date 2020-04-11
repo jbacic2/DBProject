@@ -3,6 +3,7 @@ package comp.databases.project.customer
 import comp.databases.project.customer.auth.control.loginOperation
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.DummyAuthManager
+import comp.databases.project.customer.auth.data.RealAuthManager
 import comp.databases.project.customer.books.data.DummyRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.books.view.printBookDetail
@@ -85,5 +86,5 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
 }
 
 fun main() {
-    CustomerControl(DummyAuthManager, DummyRepository).run()
+    CustomerControl(RealAuthManager, DummyRepository).run()
 }

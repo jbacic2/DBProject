@@ -10,7 +10,7 @@ object DummyAuthManager : AuthManager {
 
 
         return if (email == "test@books.ca" && password == "password") {
-            customer = Customer(email)
+            customer = Customer(email, password, 111111111, 2,2022, 111)
             true
         } else {
             false
