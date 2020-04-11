@@ -8,7 +8,6 @@ object BookDatabase {
 
     init {
         connection = DriverManager.getConnection("jdbc:postgresql://localhost:8888/postgres", "postgres", "postgres");
-        //Statement statement = connection.createStatement();
 
     }
 
@@ -21,6 +20,7 @@ object BookDatabase {
         val street_num: String;
         val street_name: String;
         val postal_code: String;
+
         val pstmt = connection.prepareStatement("SELECT * FROM customer WHERE cust_email = CAST(? AS VARCHAR(40))");
         var resSet: ResultSet;
         pstmt.setString(1, email);
@@ -36,6 +36,7 @@ object BookDatabase {
             postal_code = resSet.getString(9);
 
             if (cust_password == password) {
+                println("email ${email}, street name ${street_name}");
                 return Customer(
                     email,
                     password,
@@ -50,7 +51,61 @@ object BookDatabase {
             }
         }
         return null;
-
     }
-    // Query code here
+
+    fun new_user(
+        email: String,
+        password: String,
+        card_num: String,
+        expiry_month: Int,
+        expiry_year: Int,
+        cvc_code: Int,
+        street_num: String,
+        street_name: String,
+        postal_code: String,
+        city: String,
+        country: String
+    ): Customer? {
+        //check if user is in db
+        val pstmt = connection.prepareStatement("SELECT * FROM customer WHERE cust_email = CAST(? AS VARCHAR(40))");
+        var resSet: ResultSet;
+        pstmt.setString(1, email);
+        resSet = pstmt.executeQuery();
+        if (resSet.next()) {
+            return null;
+        }
+
+        val postal_stmt = connection.prepareStatement("INSERT INTO postal_zone VALUES (CAST(? AS VARCHAR(8)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(40))) ON CONFLICT DO NOTHING");
+        postal_stmt.setString(1, postal_code);
+        postal_stmt.setString(2, city);
+        postal_stmt.setString(3, country);
+        postal_stmt.executeUpdate();
+
+
+        val cust_stmt = connection.prepareStatement("INSERT INTO customer VALUES (CAST(? AS VARCHAR(40), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(20)), CAST(? AS INT), CAST(? AS INT), CAST(? AS INT), CAST(? AS VARCHAR(20)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(8)))");
+
+        cust_stmt.setString(1, email);
+        cust_stmt.setString(2, password);
+        cust_stmt.setString(3, card_num);
+        cust_stmt.setInt(4, expiry_month);
+        cust_stmt.setInt(5, expiry_year);
+        cust_stmt.setInt(6, cvc_code);
+        cust_stmt.setString(7, street_num);
+        cust_stmt.setString(8, street_name);
+        cust_stmt.setString(9, postal_code);
+
+        cust_stmt.executeUpdate();
+
+        return Customer(
+            email,
+            password,
+            card_num,
+            expiry_month,
+            expiry_year,
+            cvc_code,
+            street_num,
+            street_name,
+            postal_code
+        );
+    }
 }

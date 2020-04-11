@@ -86,7 +86,7 @@ INSERT INTO postal_zone
 VALUES ('K1S 5B6', 'Ottawa', 'Canada');
 
 INSERT INTO customer
-VALUES ('carl@cmail.ca', 'abc123', 1234567891234561, 11, 2022, 665, 1125, 'Colonel By Dr,', 'K1S 5B6');
+VALUES ('carl@cmail.ca', 'abc123', 1234567891234561, 11, 2022, 665, 1125, 'Colonel By Dr', 'K1S 5B6');
 
 INSERT INTO cust_order 
 VALUES (1, 'Delivered', 3, 09, 2019, 12, 'Byward Market Square', 'K1N 7A1', 12, 'Byward Market Square', 'K1N 7A1', 'someone@hello.com');

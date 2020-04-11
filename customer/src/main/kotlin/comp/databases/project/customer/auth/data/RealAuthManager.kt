@@ -15,6 +15,15 @@ object RealAuthManager : AuthManager {
         return true;
     }
 
+    override fun new_user (email: String, password: String, card_num : String, expiry_month : Int, expiry_year : Int, cvc_code : Int, street_num: String, street_name : String, postal_code : String, city: String, country: String): Boolean{
+        customer = BookDatabase.new_user(email, password, card_num, expiry_month, expiry_year, cvc_code, street_num, street_name, postal_code, city, country);
+        if (customer == null){
+            return false;
+        }
+        return true;
+    }
+
+
     override fun logout() {
         customer = null
     }

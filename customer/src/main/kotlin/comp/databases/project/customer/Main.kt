@@ -44,6 +44,10 @@ class CustomerControl(
                 view.println("Logged out.")
                 true
             }
+            "addNewUser" -> {
+                // To do
+                true
+            }
             else -> false
         }
     }

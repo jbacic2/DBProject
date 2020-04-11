@@ -54,7 +54,16 @@ SELECT isbn, title, genre, synopsis, num_pages, price, stock, pub_name, author_n
 FROM book NATURAL JOIN authour
 WHERE isbn = CAST (? AS VARCHAR(17)), legacy_item = FALSE;
 
---to get user name and password
+-- to get user name and password (used in auth and new_user)
 SELECT *
 FROM customer 
 WHERE cust_email = CAST(? AS VARCHAR(40))
+
+--adding postal zone 
+INSERT INTO postal_zone
+VALUES (CAST(? AS VARCHAR(8)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(40)))
+ON CONFLICT DO NOTHING
+
+--adding new user
+INSERT INTO customer 
+VALUES (CAST(? AS VARCHAR(40), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(20)), CAST(? AS INT), CAST(? AS INT), CAST(? AS INT), CAST(? AS VARCHAR(20)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(8)))
