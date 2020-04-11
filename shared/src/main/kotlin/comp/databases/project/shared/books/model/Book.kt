@@ -1,4 +1,4 @@
-package comp.databases.project.customer.books.data.model
+package comp.databases.project.shared.books.model
 
 data class Book(
     val isbn: String,

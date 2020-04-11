@@ -1,7 +1,7 @@
 package comp.databases.project.customer.books.data
 
-import comp.databases.project.customer.books.data.model.Book
-import comp.databases.project.customer.books.data.model.BookDetail
+import comp.databases.project.shared.books.model.Book
+import comp.databases.project.shared.books.model.BookDetail
 
 interface StorefrontRepository {
     fun getSuggestedBooks(count: Int): List<Book>
