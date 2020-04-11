@@ -1,8 +1,8 @@
 package comp.databases.project.customer
 
+import com.jakewharton.picnic.table
 import comp.databases.project.customer.auth.control.loginOperation
 import comp.databases.project.customer.auth.data.AuthManager
-import comp.databases.project.customer.auth.data.DummyAuthManager
 import comp.databases.project.customer.auth.data.RealAuthManager
 import comp.databases.project.customer.books.data.DummyRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
@@ -66,6 +66,10 @@ class CustomerControl(
                 view.println("Logged out.")
                 true
             }
+            "help" -> {
+                printHelp()
+                true
+            }
             else -> false
         }
     }
@@ -90,7 +94,7 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
             Popular commands:
             * login             | Sign in to your account
             * search <query>    | Search for your favourite book
-            * view <#ID>       | View details about a search result
+            * view <#ID>        | View details about a search result
             * help              | View all commands
         """.trimIndent()
         )
@@ -104,6 +108,61 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
 
     override fun onQuit() {
         view.println("Goodbye!")
+    }
+
+    private fun printHelp() {
+        val helpTable = table {
+            cellStyle {
+                paddingLeft = 1
+                paddingRight = 1
+            }
+            header {
+                cellStyle { border = true }
+                row("command", "description")
+            }
+
+            row {
+                cellStyle {
+                    borderBottom = true
+                    paddingTop = 1
+                }
+                cell("Account") {
+                    columnSpan = 2
+                }
+            }
+            row("login", "Log in to your account")
+            row("logout", "Log out of your account")
+            row("account", "View account details of logged in customer")
+            row("orders", "View the current status of orders for the logged in customer")
+            row("cart", "View your cart")
+
+            row {
+                cellStyle {
+                    borderBottom = true
+                    paddingTop = 1
+                }
+                cell("Store") {
+                    columnSpan = 2
+                }
+            }
+            row("search <query>", "Search for books by the given <query>")
+            row("view <#ID>", "Look at details for a specific book using its <#ID> from the search results")
+
+            row {
+                cellStyle {
+                    borderBottom = true
+                    paddingTop = 1
+                }
+                cell("Shopping") {
+                    columnSpan = 2
+                }
+            }
+            row("add <#ID>", "Add a book to your cart using its <#ID>")
+            row("add", "Add a book directly to your cart after [view]ing it")
+            row("remove <#ID>", "Remove a book from your cart using its <#ID> from the cart")
+        }
+
+        view.println("$helpTable")
     }
 }
 
