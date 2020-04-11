@@ -3,7 +3,11 @@ services:
   database:
     image: library/postgres:12
     volumes:
-      - ./SQL:/docker-entrypoint-initdb.d/
+      - ./SQL/DDL.sql:/docker-entrypoint-initdb.d/DDL.sql
+      - ./SQL/Functions.sql:/docker-entrypoint-initdb.d/Functions.sql
+      - ./SQL/SomeTests.sql:/docker-entrypoint-initdb.d/SomeTests.sql
+      - ./SQL/SomeTesttData.sql:/docker-entrypoint-initdb.d/SomeTesttData.sql
+      - ./SQL/Triggers.sql:/docker-entrypoint-initdb.d/Triggers.sql
       - bookstore:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: "postgres"
