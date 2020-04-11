@@ -5,6 +5,7 @@ import comp.databases.project.customer.auth.control.addUserOperation
 import comp.databases.project.customer.auth.control.loginOperation
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.RealAuthManager
+import comp.databases.project.customer.auth.view.printCustomer
 import comp.databases.project.customer.books.data.DummyRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.books.view.printBookDetail
@@ -86,6 +87,13 @@ class CustomerControl(
                 addUserOperation(authManager)
                 if (authManager.isAuthenticated) {
                     promptUser = authManager.customer!!.email
+                }
+                true
+            }
+            "account" -> {
+                when (val customer = authManager.customer) {
+                    null -> view.println("Not logged in.")
+                    else -> view.printCustomer(customer)
                 }
                 true
             }

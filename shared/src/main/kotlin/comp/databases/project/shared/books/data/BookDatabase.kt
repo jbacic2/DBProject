@@ -83,6 +83,7 @@ object BookDatabase {
         try {
             cust_stmt.executeUpdate();
         } catch (e: Exception) {
+            e.printStackTrace()
             println("Error with new user info")
             return null
         }
