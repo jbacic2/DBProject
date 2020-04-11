@@ -1,6 +1,6 @@
 package comp.databases.project.customer
 
-import comp.databases.project.customer.auth.control.LoginControl
+import comp.databases.project.customer.auth.control.loginOperation
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.DummyAuthManager
 import comp.databases.project.customer.books.data.DummyRepository
@@ -31,7 +31,7 @@ class CustomerControl(
                 true
             }
             "login" -> {
-                LoginControl(authManager, view).run()
+                loginOperation(authManager)
                 if (authManager.isAuthenticated) {
                     promptUser = authManager.customer!!.email
                 }

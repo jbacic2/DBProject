@@ -2,7 +2,7 @@ package comp.databases.project.shared
 
 import kotlin.system.exitProcess
 
-abstract class Control(protected val view: View) {
+abstract class Control(val view: View) {
     protected open var promptUser: String = ""
     private var _run = true
 
