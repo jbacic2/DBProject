@@ -13,6 +13,7 @@ import comp.databases.project.customer.cart.addOperation
 import comp.databases.project.customer.cart.placeOrder
 import comp.databases.project.customer.cart.removeOperation
 import comp.databases.project.customer.cart.view.printCart
+import comp.databases.project.customer.cart.view.printOrders
 import comp.databases.project.customer.data.StoreViewState
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
@@ -64,6 +65,10 @@ class CustomerControl(
                 }
                 true
             }
+            "orders" -> {
+                view.printOrders(storefrontRepository.getOrders())
+                true
+            }
             "login" -> {
                 loginOperation(authManager)
                 if (authManager.isAuthenticated) {
@@ -77,7 +82,7 @@ class CustomerControl(
                 view.println("Logged out.")
                 true
             }
-            "addNewUser" -> {
+            "register" -> {
                 addUserOperation(authManager)
                 if (authManager.isAuthenticated) {
                     promptUser = authManager.customer!!.email
@@ -148,6 +153,7 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
                     columnSpan = 2
                 }
             }
+            row("register", "Register a new account")
             row("login", "Log in to your account")
             row("logout", "Log out of your account")
             row("account", "View account details of logged in customer")
@@ -178,6 +184,7 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
             row("add <#ID>", "Add a book to your cart using its <#ID>")
             row("add", "Add a book directly to your cart after [view]ing it")
             row("remove <#ID>", "Remove a book from your cart using its <#ID> from the cart")
+            row("order", "Order everything in the current cart")
         }
 
         view.println("$helpTable")

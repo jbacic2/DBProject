@@ -98,42 +98,42 @@ object BookDatabase {
         )
     }
 
-    fun searchBooks1(query : String):List<Book>?{
-        val isbn: String
-        val title: String
-        val genre: String
-        val coverImage: String?
-        val synopsis: String?
-        val pages: Int
-        val price: Double
-        val stock: Int
-        val publisher: String
-        val percentOfSales: Double
-        val isLegacyItem: Boolean
-
-        val pstmt = connection.prepareStatement("SELECT * FROM book WHERE isbn = CAST (? AS VARCHAR(17)) AND legacy_item = FALSE UNION SELECT isbn, title,  price FROM book WHERE title = ? AND legacy_item = FALSE UNION  SELECT isbn, title,  price FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND legacy_item = FALSE UNION SELECT isbn, title,  price FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND legacy_item = FALSE UNION SELECT isbn, title, price FROM book NATURAL JOIN author WHERE author_name = ?  AND legacy_item = FALSE");
-        var resSet: ResultSet;
-        pstmt.setString(1, query);
-        pstmt.setString(2, query);
-        pstmt.setString(3, query);
-        pstmt.setString(4, query);
-        pstmt.setString(5, query);
-
-        resSet = pstmt.executeQuery();
-        if (resSet.next()) {
-            isbn = resSet.getString(1)
-            title = resSet.getString(2)
-            genre = resSet.getString(3)
-            coverImage = resSet.getString(4)
-            synopsis = resSet.getString(5)
-        }
-
-
-    }
-    fun searchBooks2(query : String){
-
-    }
-    fun searchBooks2(query : String){
-
-    }
+//    fun searchBooks1(query : String):List<Book>?{
+//        val isbn: String
+//        val title: String
+//        val genre: String
+//        val coverImage: String?
+//        val synopsis: String?
+//        val pages: Int
+//        val price: Double
+//        val stock: Int
+//        val publisher: String
+//        val percentOfSales: Double
+//        val isLegacyItem: Boolean
+//
+//        val pstmt = connection.prepareStatement("SELECT * FROM book WHERE isbn = CAST (? AS VARCHAR(17)) AND legacy_item = FALSE UNION SELECT isbn, title,  price FROM book WHERE title = ? AND legacy_item = FALSE UNION  SELECT isbn, title,  price FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND legacy_item = FALSE UNION SELECT isbn, title,  price FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND legacy_item = FALSE UNION SELECT isbn, title, price FROM book NATURAL JOIN author WHERE author_name = ?  AND legacy_item = FALSE");
+//        var resSet: ResultSet;
+//        pstmt.setString(1, query);
+//        pstmt.setString(2, query);
+//        pstmt.setString(3, query);
+//        pstmt.setString(4, query);
+//        pstmt.setString(5, query);
+//
+//        resSet = pstmt.executeQuery();
+//        if (resSet.next()) {
+//            isbn = resSet.getString(1)
+//            title = resSet.getString(2)
+//            genre = resSet.getString(3)
+//            coverImage = resSet.getString(4)
+//            synopsis = resSet.getString(5)
+//        }
+//
+//
+//    }
+//    fun searchBooks2(query : String){
+//
+//    }
+//    fun searchBooks2(query : String){
+//
+//    }
 }

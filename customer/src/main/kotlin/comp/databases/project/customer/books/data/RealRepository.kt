@@ -1,10 +1,12 @@
 package comp.databases.project.customer.books.data
 
+import comp.databases.project.shared.books.data.Address
 import comp.databases.project.shared.books.data.BookDatabase
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
 import comp.databases.project.shared.cart.model.Cart
+import comp.databases.project.shared.cart.model.Order
 
 private val dummyBooks = listOf(
     BookDetail(
@@ -53,16 +55,18 @@ object RealRepository : StorefrontRepository {
     override fun getSuggestedBooks(count: Int): List<Book> = dummyBooks.map { (book) -> book }
 
     override fun searchBooks(query: String): List<Book> {
-        var books: List<Book>
-        if (query.length<=17){
-            books = BookDatabase.searchBooks1(query)
-        }
-        else if (query.length<=40){
-            books = BookDatabase.searchBooks2(query)
-        }
-        else{
-            books = BookDatabase.searchBooks3(query)
-        }
+//        var books: List<Book>
+//        if (query.length<=17){
+//            books = BookDatabase.searchBooks1(query)
+//        }
+//        else if (query.length<=40){
+//            books = BookDatabase.searchBooks2(query)
+//        }
+//        else{
+//            books = BookDatabase.searchBooks3(query)
+//        }
+
+        return emptyList()
     }
 
     override fun getBookDetail(isbn: String): BookDetail? = dummyBooks.find { (book) -> book.isbn == isbn }
@@ -97,4 +101,12 @@ object RealRepository : StorefrontRepository {
     }
 
     override fun getCart(): Cart? = cart
+
+    override fun submitOrder(address: Address?): Order? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getOrders(): List<Order> {
+        TODO("Not yet implemented")
+    }
 }

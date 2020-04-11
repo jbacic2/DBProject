@@ -22,4 +22,6 @@ interface StorefrontRepository {
     fun getCart(): Cart?
 
     fun submitOrder(address: Address? = null): Order?
+
+    fun getOrders(): List<Order>
 }

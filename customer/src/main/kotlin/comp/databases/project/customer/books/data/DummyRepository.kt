@@ -6,6 +6,7 @@ import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
 import comp.databases.project.shared.cart.model.Cart
 import comp.databases.project.shared.cart.model.Order
+import kotlin.random.Random
 
 private val dummyBooks = listOf(
     BookDetail(
@@ -90,5 +91,20 @@ object DummyRepository : StorefrontRepository {
 
     override fun submitOrder(address: Address?): Order? {
         return null
+    }
+
+    override fun getOrders(): List<Order> {
+        val address = Address("170", "Finn Court", "K1V 2C8", "Ottawa", "Canada")
+        return listOf(
+            Order(5246L,
+                Order.Status.AwaitingShipment,
+                1,
+                1,
+                2020,
+                address,
+                address,
+                "test@books.ca",
+                dummyBooks.map { (book) -> Order.Item(book, Random(50).nextInt(1, 10)) })
+        )
     }
 }
