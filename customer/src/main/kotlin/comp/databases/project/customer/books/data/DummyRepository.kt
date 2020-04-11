@@ -1,5 +1,6 @@
 package comp.databases.project.customer.books.data
 
+import comp.databases.project.shared.books.data.Address
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
@@ -85,4 +86,8 @@ object DummyRepository : StorefrontRepository {
     }
 
     override fun getCart(): Cart? = cart
+
+    override fun submitOrder(address: Address?): Boolean {
+        return true
+    }
 }

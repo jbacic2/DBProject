@@ -3,6 +3,7 @@ package comp.databases.project.customer.cart
 import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.data.StoreViewState
 import comp.databases.project.shared.Control
+import comp.databases.project.shared.books.data.Address
 
 private fun checkId(id: Int, list: List<*>): Boolean = id < list.size && id >= 0
 
@@ -70,5 +71,44 @@ fun Control.removeOperation(repository: StorefrontRepository, viewState: StoreVi
             1L -> view.printerrln("Could not remove item from cart.")
             else -> view.printerrln("Could not remove items from cart.")
         }
+    }
+}
+
+fun Control.placeOrder(repository: StorefrontRepository): Boolean {
+    var selection: String? = null
+    while (selection !in arrayOf("y", "n")) {
+        view.print("Use billing address as shipping address [y/n]: ")
+        selection = view.readLine()?.toLowerCase()
+
+        if (selection == null) {
+            view.printerrln("Could not read input.")
+            return false
+        }
+    }
+
+    return if (selection == "y") {
+        repository.submitOrder()
+    } else {
+        view.println("""
+            |Shipping Address Details
+            |------------------------
+        """.trimMargin())
+
+        view.print("Street Number: ")
+        val streetNumber = view.readLine() ?: return false
+
+        view.print("Street Name: ")
+        val streetName = view.readLine() ?: return false
+
+        view.print("Postal Code: ")
+        val postalCode = view.readLine() ?: return false
+
+        view.print("City: ")
+        val city = view.readLine() ?: return false
+
+        view.print("Country: ")
+        val country = view.readLine() ?: return false
+
+        repository.submitOrder(Address(streetNumber, streetName, postalCode, city, country))
     }
 }

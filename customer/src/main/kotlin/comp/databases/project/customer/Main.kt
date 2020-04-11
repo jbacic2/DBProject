@@ -10,6 +10,7 @@ import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.books.view.printBookDetail
 import comp.databases.project.customer.books.view.printSearchResults
 import comp.databases.project.customer.cart.addOperation
+import comp.databases.project.customer.cart.placeOrder
 import comp.databases.project.customer.cart.removeOperation
 import comp.databases.project.customer.cart.view.printCart
 import comp.databases.project.customer.data.StoreViewState
@@ -52,6 +53,14 @@ class CustomerControl(
                 storefrontRepository.getCart()?.let { cart ->
                     view.printCart(cart)
                     viewState = StoreViewState.CartView(cart.items)
+                }
+                true
+            }
+            "order" -> {
+                if (placeOrder(storefrontRepository)) {
+                    view.println("Order placed.")
+                } else {
+                    view.printerrln("Failed to place order.")
                 }
                 true
             }
