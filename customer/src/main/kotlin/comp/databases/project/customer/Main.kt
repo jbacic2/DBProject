@@ -10,6 +10,7 @@ import comp.databases.project.customer.books.view.printBookDetail
 import comp.databases.project.customer.books.view.printSearchResults
 import comp.databases.project.customer.cart.addOperation
 import comp.databases.project.customer.cart.removeOperation
+import comp.databases.project.customer.cart.view.printCart
 import comp.databases.project.customer.data.StoreViewState
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
@@ -47,9 +48,9 @@ class CustomerControl(
                 true
             }
             "cart" -> {
-                view.println("TODO: Print Cart here")
-                storefrontRepository.getCart()?.let { (_, items) ->
-                    viewState = StoreViewState.CartView(items)
+                storefrontRepository.getCart()?.let { cart ->
+                    view.printCart(cart)
+                    viewState = StoreViewState.CartView(cart.items)
                 }
                 true
             }
