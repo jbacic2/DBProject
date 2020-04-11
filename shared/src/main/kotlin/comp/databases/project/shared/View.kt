@@ -29,4 +29,8 @@ open class View(var prompt: String = "> ") {
             null
         }
     }
+
+    fun readLine(): String? {
+        return kotlin.io.readLine()
+    }
 }

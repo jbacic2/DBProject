@@ -6,5 +6,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     api "org.postgresql:postgresql:42.2.12"
     api "com.jakewharton.picnic:picnic:0.3.0"
+    api "com.github.davidmoten:word-wrap:0.1.6"
 }
 

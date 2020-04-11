@@ -35,7 +35,7 @@ private val dummyBooks = listOf(
             0.10,
             false
         ),
-        listOf(Author("J. K. Rowling", "0-7475-3849-2"))
+        listOf(Author("J. K. Rowling", "0-7475-3849-2"), Author("J. K. Rowling", "0-7475-3849-2"), Author("J. K. Rowling", "0-7475-3849-2"), Author("J. K. Rowling", "0-7475-3849-2"), Author("J. K. Rowling", "0-7475-3849-2"))
     )
 )
 

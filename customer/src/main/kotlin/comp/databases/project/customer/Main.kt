@@ -1,10 +1,11 @@
 package comp.databases.project.customer
 
-import comp.databases.project.customer.auth.control.LoginControl
+import comp.databases.project.customer.auth.control.loginOperation
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.DummyAuthManager
 import comp.databases.project.customer.books.data.DummyRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
+import comp.databases.project.customer.books.view.printBookDetail
 import comp.databases.project.customer.books.view.printSearchResults
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
@@ -24,8 +25,13 @@ class CustomerControl(
                 view.printSearchResults(books)
                 true
             }
+            "view" -> {
+                val detail = storefrontRepository.getBookDetail("0-7475-3849-2")
+                view.printBookDetail(detail!!)
+                true
+            }
             "login" -> {
-                LoginControl(authManager, view).run()
+                loginOperation(authManager)
                 if (authManager.isAuthenticated) {
                     promptUser = authManager.customer!!.email
                 }

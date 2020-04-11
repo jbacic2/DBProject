@@ -4,38 +4,22 @@ import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.View
 
+fun Control.loginOperation(authManager: AuthManager) {
+    var attempts = 0
 
-class LoginControl(private val authManager: AuthManager, view: View = View()) : Control(view) {
-    private var email: String? = null
-
-    override fun onInitialize() {
-        view.prompt = ""
+    while (attempts < 2) {
         view.print("Email: ")
-    }
+        val email = view.readLine() ?: ""
+        view.print("Password: \r")
+        val password = if (System.console() != null) view.readPassword() else view.readLine()
 
-    override fun onCommand(args: List<String>): Boolean {
-        email = args.joinToString()
-        var attempts = 0
-
-        while (attempts < 2) {
-            view.print("Password: ")
-            val password = if (System.console() != null) view.readPassword() else view.prompt()?.joinToString()
-
-            if (authManager.authenticate(email!!, password ?: "")) {
-                quit()
-                return true
-            } else {
-                view.println("Wrong email or password.\n")
-                attempts++
-            }
+        if (authManager.authenticate(email, password ?: "")) {
+            return
+        } else {
+            view.println("Wrong email or password.\n")
+            attempts++
         }
-
-        view.println("Unable to login.")
-        quit()
-        return true
     }
 
-    override fun onQuit() {
-        view.resetPrompt()
-    }
+    view.println("Unable to log in.\n")
 }
