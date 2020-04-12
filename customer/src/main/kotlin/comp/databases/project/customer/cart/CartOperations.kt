@@ -4,6 +4,7 @@ import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.data.StoreViewState
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.books.data.Address
+import comp.databases.project.shared.cart.model.Order
 
 private fun checkId(id: Int, list: List<*>): Boolean = id < list.size && id >= 0
 
@@ -74,7 +75,7 @@ fun Control.removeOperation(repository: StorefrontRepository, viewState: StoreVi
     }
 }
 
-fun Control.placeOrder(repository: StorefrontRepository): Boolean {
+fun Control.placeOrder(repository: StorefrontRepository): Order? {
     var selection: String? = null
     while (selection !in arrayOf("y", "n")) {
         view.print("Use billing address as shipping address [y/n]: ")
@@ -82,7 +83,7 @@ fun Control.placeOrder(repository: StorefrontRepository): Boolean {
 
         if (selection == null) {
             view.printerrln("Could not read input.")
-            return false
+            return null
         }
     }
 
@@ -95,19 +96,19 @@ fun Control.placeOrder(repository: StorefrontRepository): Boolean {
         """.trimMargin())
 
         view.print("Street Number: ")
-        val streetNumber = view.readLine() ?: return false
+        val streetNumber = view.readLine() ?: return null
 
         view.print("Street Name: ")
-        val streetName = view.readLine() ?: return false
+        val streetName = view.readLine() ?: return null
 
         view.print("Postal Code: ")
-        val postalCode = view.readLine() ?: return false
+        val postalCode = view.readLine() ?: return null
 
         view.print("City: ")
-        val city = view.readLine() ?: return false
+        val city = view.readLine() ?: return null
 
         view.print("Country: ")
-        val country = view.readLine() ?: return false
+        val country = view.readLine() ?: return null
 
         repository.submitOrder(Address(streetNumber, streetName, postalCode, city, country))
     }

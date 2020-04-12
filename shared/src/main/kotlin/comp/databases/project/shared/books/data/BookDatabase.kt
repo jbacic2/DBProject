@@ -85,6 +85,7 @@ object BookDatabase {
         try {
             cust_stmt.executeUpdate();
         } catch (e: Exception) {
+            e.printStackTrace()
             println("Error with new user info")
             return null
         }
@@ -154,7 +155,7 @@ object BookDatabase {
         }
 
         val finalBooks: List<Book> = bookList
-        return finalBooks;
+	return finalBooks;
     }
 
     fun getBookDetail(book: Book): BookDetail{
@@ -170,4 +171,7 @@ object BookDatabase {
         }
         return BookDetail(book,authorList)
     }
+
+
+
 }

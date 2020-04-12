@@ -6,6 +6,7 @@ import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
 import comp.databases.project.shared.cart.model.Cart
+import comp.databases.project.shared.cart.model.Order
 
 private val dummyBooks = listOf(
     BookDetail(
@@ -57,7 +58,6 @@ object RealRepository : StorefrontRepository {
         var books: List<Book>
         books=BookDatabase.searchBooks(query)
         return books
-    }
 
     override fun getBookDetail(book: Book): BookDetail{
         return BookDatabase.getBookDetail(book);
@@ -97,4 +97,12 @@ object RealRepository : StorefrontRepository {
     }
 
     override fun getCart(): Cart? = cart
+
+    override fun submitOrder(address: Address?): Order? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getOrders(): List<Order> {
+        TODO("Not yet implemented")
+    }
 }
