@@ -5,6 +5,7 @@ import comp.databases.project.customer.auth.control.addUserOperation
 import comp.databases.project.customer.auth.control.loginOperation
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.RealAuthManager
+import comp.databases.project.customer.auth.view.printCustomer
 import comp.databases.project.customer.books.data.RealRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.books.view.printBookDetail
@@ -119,10 +120,6 @@ class CustomerControl(
                 }
                 true
             }
-            "help" -> {
-                printHelp()
-                true
-            }
             else -> false
         }
     }
@@ -163,7 +160,7 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
         view.println("Goodbye!")
     }
 
-    private fun printHelp() {
+    override fun onHelp() {
         val helpTable = table {
             cellStyle {
                 paddingLeft = 1
