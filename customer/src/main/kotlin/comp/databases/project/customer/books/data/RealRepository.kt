@@ -49,7 +49,7 @@ private val dummyBooks = listOf(
     )
 )
 
-private var cart: Cart? = null
+//private var cart: Cart? = null
 
 object RealRepository : StorefrontRepository {
     override fun getSuggestedBooks(count: Int): List<Book> = dummyBooks.map { (book) -> book }
@@ -64,8 +64,10 @@ object RealRepository : StorefrontRepository {
         return BookDatabase.getBookDetail(book);
     }
 
-    override fun addToCart(isbn: String, quantity: Long): Boolean {
-        if (cart != null) {
+    override fun addToCart(isbn: String, quantity: Long, email: String): Boolean {
+        return BookDatabase.addToCart(isbn,quantity,email)
+
+        /*if (cart != null) {
             cart = cart?.copy(
                 items = cart!!.items + Cart.Item(
                     dummyBooks.map { (book) -> book }.find { it.isbn == isbn }!!,
@@ -81,12 +83,12 @@ object RealRepository : StorefrontRepository {
                     )
                 )
             )
-        }
+        }*/
         return true
     }
 
-    override fun removeFromCart(isbn: String): Boolean {
-        return true
+    override fun removeFromCart(isbn: String, email: String): Boolean {
+        return BookDatabase.removeFromCart(isbn, email)
     }
 
     override fun updateCartItem(isbn: String, quantity: Int) {

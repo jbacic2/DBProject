@@ -8,7 +8,7 @@ import comp.databases.project.shared.cart.model.Order
 
 private fun checkId(id: Int, list: List<*>): Boolean = id < list.size && id >= 0
 
-fun Control.addOperation(repository: StorefrontRepository, viewState: StoreViewState, id: Int = -1) {
+fun Control.addOperation(repository: StorefrontRepository, viewState: StoreViewState, email: String, id: Int = -1) {
 
     if (viewState is StoreViewState.NoView ||
         id < 0 && viewState !is StoreViewState.DetailView
@@ -35,10 +35,10 @@ fun Control.addOperation(repository: StorefrontRepository, viewState: StoreViewS
         StoreViewState.NoView -> throw IllegalStateException()
         is StoreViewState.DetailView -> viewState.book.detail.isbn
         is StoreViewState.SearchResultsView -> viewState.books[id].isbn
-        is StoreViewState.CartView -> TODO()
+        is StoreViewState.CartView -> viewState.items[id].book.isbn
     }
 
-    if (!repository.addToCart(item, quantity)) {
+    if (!repository.addToCart(item, quantity, email)) {
         when (quantity) {
             1L -> view.printerrln("Couldn't add item to cart.")
             else -> view.printerrln("Couldn't add items to cart.")
@@ -51,7 +51,7 @@ fun Control.addOperation(repository: StorefrontRepository, viewState: StoreViewS
     }
 }
 
-fun Control.removeOperation(repository: StorefrontRepository, viewState: StoreViewState, id: Int = -1) {
+fun Control.removeOperation(repository: StorefrontRepository, viewState: StoreViewState, email: String, id: Int = -1) {
     if (viewState !is StoreViewState.CartView) {
         view.printerrln("Cannot remove item from card when not viewing cart. Run [cart] to view cart.")
         return
@@ -62,7 +62,7 @@ fun Control.removeOperation(repository: StorefrontRepository, viewState: StoreVi
         return
     }
 
-    if (repository.removeFromCart(viewState.items[id].book.isbn)) {
+    if (repository.removeFromCart(viewState.items[id].book.isbn, email)) {
         when (viewState.items[id].quantity) {
             1L -> view.println("Removed item from cart.")
             else -> view.println("Removed items from cart.")

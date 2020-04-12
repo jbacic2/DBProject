@@ -13,9 +13,9 @@ interface StorefrontRepository {
 
     fun getBookDetail(book: Book): BookDetail
 
-    fun addToCart(isbn: String, quantity: Long = 1): Boolean
+    fun addToCart(isbn: String, quantity: Long = 1, email: String): Boolean
 
-    fun removeFromCart(isbn: String): Boolean
+    fun removeFromCart(isbn: String, email: String): Boolean
 
     fun updateCartItem(isbn: String, quantity: Int)
 

@@ -3,12 +3,9 @@ package comp.databases.project.shared.books.data
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
-<<<<<<< HEAD
 import comp.databases.project.shared.cart.model.Cart
-=======
 import comp.databases.project.shared.cart.model.Order
 import comp.databases.project.shared.reports.model.Report
->>>>>>> ce5faf2fb6bb4dcad454b0468245cbcc9a181996
 
 import java.lang.Exception
 import java.sql.*;
@@ -337,7 +334,65 @@ object BookDatabase {
         } catch (e: Exception) {
             return null
         }
-
         return null
+    }
+
+    fun addToCart(isbn: String, quantity: Long, email: String): Boolean {
+        //get the Cart ot the current user
+        val cartCheckStmt = connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
+        cartCheckStmt.setString(1, email)
+        val resSet:ResultSet = cartCheckStmt.executeQuery()
+        if (resSet.next()){
+            val orderNum = resSet.getInt(1)
+
+            //update the cart to add the product
+            val addStmt = connection.prepareStatement("INSERT INTO book_ordered VALUES (CAST(? AS INT), CAST(? AS VARCHAR(17)), CAST(? AS INT)) ON CONFLICT (order_num, isbn) DO UPDATE SET quantity = book_ordered.quantity + CAST(? AS INT)");
+            addStmt.setInt(1, orderNum)
+            addStmt.setString(2, isbn)
+            addStmt.setLong(3, quantity)
+            addStmt.setLong(4, quantity)
+            try {
+                addStmt.executeUpdate()
+            }catch (e: Exception){
+                println(e)
+                println("Unable to add book to cart")
+                return false
+            }
+            return true
+        }
+        else{
+            println("Error: The current user does not have a cart, try to logout and log back in")
+            return false
+        }
+
+        return false
+    }
+
+    fun removeFromCart(isbn: String, email: String): Boolean {
+        //get the Cart ot the current user
+        val cartCheckStmt = connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
+        cartCheckStmt.setString(1, email)
+        val resSet:ResultSet = cartCheckStmt.executeQuery()
+        if (resSet.next()){
+            val orderNum = resSet.getInt(1)
+
+            //update the cart to add the product
+            val rmStmt = connection.prepareStatement("DELETE FROM book_ordered WHERE order_num = CAST(? AS INT) AND isbn = CAST(? AS VARCHAR(17))");
+            rmStmt.setInt(1, orderNum)
+            rmStmt.setString(2, isbn)
+            try {
+                rmStmt.executeUpdate()
+            }catch (e: Exception){
+                println(e)
+                println("Unable to remove book from cart")
+                return false
+            }
+            return true
+        }
+        else{
+            println("Error: The current user does not have a cart, try to logout and log back in")
+            return false
+        }
+        return false
     }
 }

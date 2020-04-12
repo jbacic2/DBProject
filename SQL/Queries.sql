@@ -49,6 +49,15 @@ SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_n
 FROM book NATURAL JOIN book_ordered NATURAL JOIN cust_order 
 WHERE status = 'Cart' AND cust_email = ?
 
+-- Adding to a cart
+INSERT INTO book_ordered 
+VALUES (CAST(? AS INT), CAST(? AS VARCHAR(17)), CAST(? AS INT)) 
+ON CONFLICT (order_num, isbn) DO UPDATE SET quantity = book_ordered.quantity + CAST(? AS INT);
+
+--Remove from cart
+DELETE FROM book_ordered WHERE order_num =(CAST(? AS INT) AND isbn = CAST(? AS VARCHAR(17)))
+
+
 --adding a new book
 INSERT INTO book VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 --insert related authors for book

@@ -72,7 +72,7 @@ class CustomerControl(
                     view.println("You must first login to access a cart")
                 }
                 else{
-                    addOperation(storefrontRepository, viewState, args.getOrNull(1)?.toIntOrNull() ?: -1)
+                    addOperation(storefrontRepository, viewState, authManager.customer!!.email,args.getOrNull(1)?.toIntOrNull() ?: -1)
                 }
                 true
             }
@@ -81,7 +81,7 @@ class CustomerControl(
                     view.println("You must first login to access a cart")
                 }
                 else {
-                    removeOperation(storefrontRepository, viewState, args.getOrNull(1)?.toIntOrNull() ?: -1)
+                    removeOperation(storefrontRepository, viewState, authManager.customer!!.email,args.getOrNull(1)?.toIntOrNull() ?: -1)
                 }
                 true
             }
