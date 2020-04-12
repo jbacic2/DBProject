@@ -120,10 +120,6 @@ class CustomerControl(
                 }
                 true
             }
-            "help" -> {
-                printHelp()
-                true
-            }
             else -> false
         }
     }
@@ -164,7 +160,7 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
         view.println("Goodbye!")
     }
 
-    private fun printHelp() {
+    override fun onHelp() {
         val helpTable = table {
             cellStyle {
                 paddingLeft = 1

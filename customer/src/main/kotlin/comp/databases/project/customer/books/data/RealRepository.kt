@@ -56,8 +56,9 @@ object RealRepository : StorefrontRepository {
 
     override fun searchBooks(query: String): List<Book> {
         var books: List<Book>
-        books=BookDatabase.searchBooks(query)
+        books = BookDatabase.searchBooks(query)
         return books
+    }
 
     override fun getBookDetail(book: Book): BookDetail{
         return BookDatabase.getBookDetail(book);
@@ -85,10 +86,6 @@ object RealRepository : StorefrontRepository {
     }
 
     override fun removeFromCart(isbn: String): Boolean {
-        return true
-    }
-
-    override fun submitOrder(address: Address?): Boolean {
         return true
     }
 
