@@ -1,4 +1,4 @@
-package comp.databases.project.customer.books.data
+/*package comp.databases.project.customer.books.data
 
 import comp.databases.project.shared.books.data.Address
 import comp.databases.project.shared.books.model.Author
@@ -90,4 +90,4 @@ object DummyRepository : StorefrontRepository {
     override fun submitOrder(address: Address?): Boolean {
         return true
     }
-}
+}*/

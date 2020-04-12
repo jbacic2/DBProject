@@ -5,7 +5,7 @@ import comp.databases.project.customer.auth.control.addUserOperation
 import comp.databases.project.customer.auth.control.loginOperation
 import comp.databases.project.customer.auth.data.AuthManager
 import comp.databases.project.customer.auth.data.RealAuthManager
-import comp.databases.project.customer.books.data.DummyRepository
+import comp.databases.project.customer.books.data.RealRepository
 import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.books.view.printBookDetail
 import comp.databases.project.customer.books.view.printSearchResults
@@ -36,9 +36,31 @@ class CustomerControl(
                 true
             }
             "view" -> {
-                val detail = storefrontRepository.getBookDetail("0-7475-3849-2")!!
-                view.printBookDetail(detail)
-                viewState = StoreViewState.DetailView(detail)
+                if(viewState is StoreViewState.SearchResultsView){
+                    try {
+                        if (args[1].toInt() < (viewState as StoreViewState.SearchResultsView).books.size) {
+                            val book = (viewState as StoreViewState.SearchResultsView).books[args[1].toInt()]
+                            val detail = storefrontRepository.getBookDetail(book)!!
+                            view.printBookDetail(detail)
+                            viewState = StoreViewState.DetailView(detail)
+                        }
+                    } catch (e:Exception){
+                    view.println("Enter the number of a book ID on the screen")
+                    }
+                }
+                if(viewState is StoreViewState.CartView){
+                    try {
+                        if (args[1].toInt() < (viewState as StoreViewState.CartView).items.size) {
+                            val book = (viewState as StoreViewState.CartView).items[args[1].toInt()].book
+                            val detail = storefrontRepository.getBookDetail(book)!!
+                            view.printBookDetail(detail)
+                            viewState = StoreViewState.DetailView(detail)
+                        }
+                    } catch (e:Exception){
+                        view.println("Enter the number of a book ID on the screen")
+                    }
+                }
+                view.println("You must first search for Enter the number of a book ID on the screen")
                 true
             }
             "add" -> {
@@ -185,5 +207,5 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
 }
 
 fun main() {
-    CustomerControl(RealAuthManager, DummyRepository).run()
+    CustomerControl(RealAuthManager, RealRepository).run()
 }

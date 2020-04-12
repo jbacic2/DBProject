@@ -1,5 +1,6 @@
 package comp.databases.project.customer.books.data
 
+import comp.databases.project.shared.books.data.Address
 import comp.databases.project.shared.books.data.BookDatabase
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
@@ -21,7 +22,7 @@ private val dummyBooks = listOf(
             0.12,
             false
         ),
-        listOf(Author("J. K. Rowling", "0-7475-3269-9"))
+        listOf(Author("J. K. Rowling"))
     ),
     BookDetail(
         Book(
@@ -38,11 +39,11 @@ private val dummyBooks = listOf(
             false
         ),
         listOf(
-            Author("J. K. Rowling", "0-7475-3849-2"),
-            Author("J. K. Rowling", "0-7475-3849-2"),
-            Author("J. K. Rowling", "0-7475-3849-2"),
-            Author("J. K. Rowling", "0-7475-3849-2"),
-            Author("J. K. Rowling", "0-7475-3849-2")
+            Author("J. K. Rowling"),
+            Author("J. K. Rowling"),
+            Author("J. K. Rowling"),
+            Author("J. K. Rowling"),
+            Author("J. K. Rowling")
         )
     )
 )
@@ -54,18 +55,13 @@ object RealRepository : StorefrontRepository {
 
     override fun searchBooks(query: String): List<Book> {
         var books: List<Book>
-        if (query.length<=17){
-            books = BookDatabase.searchBooks1(query)
-        }
-        else if (query.length<=40){
-            books = BookDatabase.searchBooks2(query)
-        }
-        else{
-            books = BookDatabase.searchBooks3(query)
-        }
+        books=BookDatabase.searchBooks(query)
+        return books
     }
 
-    override fun getBookDetail(isbn: String): BookDetail? = dummyBooks.find { (book) -> book.isbn == isbn }
+    override fun getBookDetail(book: Book): BookDetail{
+        return BookDatabase.getBookDetail(book);
+    }
 
     override fun addToCart(isbn: String, quantity: Long): Boolean {
         if (cart != null) {
@@ -89,6 +85,10 @@ object RealRepository : StorefrontRepository {
     }
 
     override fun removeFromCart(isbn: String): Boolean {
+        return true
+    }
+
+    override fun submitOrder(address: Address?): Boolean {
         return true
     }
 

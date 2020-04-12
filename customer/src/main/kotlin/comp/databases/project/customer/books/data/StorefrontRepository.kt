@@ -10,7 +10,7 @@ interface StorefrontRepository {
 
     fun searchBooks(query: String): List<Book>
 
-    fun getBookDetail(isbn: String): BookDetail?
+    fun getBookDetail(book: Book): BookDetail
 
     fun addToCart(isbn: String, quantity: Long = 1): Boolean
 
