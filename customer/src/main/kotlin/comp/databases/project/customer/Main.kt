@@ -52,9 +52,10 @@ class CustomerControl(
                 true
             }
             "cart" -> {
-                storefrontRepository.getCart()?.let { cart ->
-                    view.printCart(cart)
-                    viewState = StoreViewState.CartView(cart.items)
+                val cart = storefrontRepository.getCart()
+                view.printCart(cart)
+                cart?.let {
+                    viewState = StoreViewState.CartView(it.items)
                 }
                 true
             }
@@ -192,7 +193,7 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
             row("add <#ID>", "Add a book to your cart using its <#ID>")
             row("add", "Add a book directly to your cart after [view]ing it")
             row("remove <#ID>", "Remove a book from your cart using its <#ID> from the cart")
-            row("order", "Order everything in the current cart")
+            row("order", "Place an order for everything that is currently in your shopping cart")
         }
 
         view.println("$helpTable")

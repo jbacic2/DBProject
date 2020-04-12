@@ -11,7 +11,24 @@ import java.util.*
 
 private const val MAX_TITLE_WIDTH = 60
 
-fun View.printCart(cart: Cart) {
+fun View.printCart(cart: Cart?) {
+    if (cart == null) {
+        print(table {
+            cellStyle { border = true
+            paddingLeft = 1
+            paddingRight = 1}
+
+            row {
+                cell("Cart")
+            }
+
+            row {
+                cell("No items in cart.")
+            }
+        })
+        return
+    }
+
     val formatter = NumberFormat.getCurrencyInstance(Locale.CANADA)
     val totalPrice = cart.items.fold(0.0) { acc, (book, quantity) -> acc + book.price * quantity }
 
@@ -58,6 +75,14 @@ fun View.printCart(cart: Cart) {
                 }
                 cell(formatter.format(book.price * quantity)) {
                     alignment = TextAlignment.MiddleRight
+                }
+            }
+        }
+
+        if (cart.items.isEmpty()) {
+            row {
+                cell("No items in cart.") {
+                    columnSpan = 5
                 }
             }
         }
