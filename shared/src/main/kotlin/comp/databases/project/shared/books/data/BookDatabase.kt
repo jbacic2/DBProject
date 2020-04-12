@@ -15,7 +15,8 @@ object BookDatabase {
         DriverManager.getConnection("jdbc:postgresql://localhost:8888/postgres", "postgres", "postgres");
 
     fun authenticate(email: String, password: String): Customer? {
-        val statement = connection.prepareStatement("SELECT * FROM customer NATURAL JOIN postal_zone WHERE cust_email = ?");
+        val statement =
+            connection.prepareStatement("SELECT * FROM customer NATURAL JOIN postal_zone WHERE cust_email = ?");
         statement.setString(1, email)
         val resSet: ResultSet = statement.executeQuery()
 
@@ -40,14 +41,15 @@ object BookDatabase {
 
 
             // check if the user has a cart
-            val cartCheckStmt = connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
+            val cartCheckStmt =
+                connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
             cartCheckStmt.setString(1, email)
-            val cartCheckResSet:ResultSet = cartCheckStmt.executeQuery()
-            if (cartCheckResSet.next()){
+            val cartCheckResSet: ResultSet = cartCheckStmt.executeQuery()
+            if (cartCheckResSet.next()) {
                 //they already have a cart
-            }
-            else{
-                val makeCartStmt = connection.prepareStatement("INSERT INTO cust_order (status, cust_email) VALUES ('Cart', ?)")
+            } else {
+                val makeCartStmt =
+                    connection.prepareStatement("INSERT INTO cust_order (status, cust_email) VALUES ('Cart', ?)")
                 makeCartStmt.setString(1, email)
                 try {
                     makeCartStmt.executeUpdate();
@@ -256,7 +258,7 @@ object BookDatabase {
         return true
     }
 
-    fun getCart(email: String): Cart?{
+    fun getCart(email: String): Cart? {
         var isbn: String
         var title: String
         var genre: String
@@ -270,9 +272,10 @@ object BookDatabase {
         var isLegacyItem: Boolean
         var id: Long = -1
         var quantity: Long
-        var itemList: MutableList<Cart.Item> =mutableListOf()
+        var itemList: MutableList<Cart.Item> = mutableListOf()
         val resSet: ResultSet;
-        val pstmt = connection.prepareStatement("SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item, order_num, quantity FROM book NATURAL JOIN book_ordered NATURAL JOIN cust_order WHERE status = 'Cart' AND cust_email = ?")
+        val pstmt =
+            connection.prepareStatement("SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item, order_num, quantity FROM book NATURAL JOIN book_ordered NATURAL JOIN cust_order WHERE status = 'Cart' AND cust_email = ?")
         pstmt.setString(1, email);
 
         resSet = pstmt.executeQuery();
@@ -292,9 +295,25 @@ object BookDatabase {
             isLegacyItem = resSet.getBoolean(11)
             id = resSet.getLong(12)
             quantity = resSet.getLong(13)
-            itemList.add(Cart.Item(Book(isbn,title,genre,coverImage, synopsis, pages, price, stock, publisher, percentOfSales, isLegacyItem), quantity))
+            itemList.add(
+                Cart.Item(
+                    Book(
+                        isbn,
+                        title,
+                        genre,
+                        coverImage,
+                        synopsis,
+                        pages,
+                        price,
+                        stock,
+                        publisher,
+                        percentOfSales,
+                        isLegacyItem
+                    ), quantity
+                )
+            )
         }
-        if (id.compareTo(-1) == 0){ //didn't find a cart
+        if (id.compareTo(-1) == 0) { //didn't find a cart
             return null
         }
         return Cart(id, itemList)
@@ -321,16 +340,72 @@ object BookDatabase {
                         setInt(2, year)
                     }.executeQuery()
 
-            if (result.next()) {
+            val summaryItems = if (result.next()) {
                 val sales: Double? = result.getDouble("sales")
                 val expense: Double? = result.getDouble("expense")
-
-
-                return Report(month, year, listOfNotNull(
+                listOfNotNull(
                     sales?.let { Report.LineItem("Sales", it) },
                     expense?.let { Report.LineItem("Expenses", it) }
-                ), emptyList())
+                )
+            } else emptyList()
+
+            val genres = try {
+                val resultSet = connection.prepareStatement("SELECT * FROM sales_by_genre WHERE month = ? AND year = ? ORDER BY sales")
+                    .apply {
+                        setInt(1, month)
+                        setInt(2, year)
+                    }.executeQuery()
+
+                val list = mutableListOf<Report.LineItem>()
+                while (resultSet.next()) {
+                    list.add(Report.LineItem(resultSet.getString("genre"), resultSet.getDouble("sales")))
+                }
+                list
+            } catch (e: Exception) {
+                null
             }
+
+            val authors = try {
+                val resultSet =
+                    connection.prepareStatement("SELECT * FROM sales_by_author WHERE month = ? AND year = ? ORDER BY sales")
+                        .apply {
+                            setInt(1, month)
+                            setInt(2, year)
+                        }.executeQuery()
+
+                val list = mutableListOf<Report.LineItem>()
+                while (resultSet.next()) {
+                    list.add(Report.LineItem(resultSet.getString("author_name"), resultSet.getDouble("sales")))
+                }
+                list
+            } catch (e: Exception) {
+                null
+            }
+
+            val publishers = try {
+                val resultSet =
+                    connection.prepareStatement("SELECT * FROM sales_by_publisher WHERE month = ? AND year = ? ORDER BY sales")
+                        .apply {
+                            setInt(1, month)
+                            setInt(2, year)
+                        }.executeQuery()
+
+                val list = mutableListOf<Report.LineItem>()
+                while (resultSet.next()) {
+                    list.add(Report.LineItem(resultSet.getString("pub_name"), resultSet.getDouble("sales")))
+                }
+                list
+            } catch (e: Exception) {
+                null
+            }
+
+            val categories = listOfNotNull(
+                genres?.let { Report.Category("Genres", it) },
+                authors?.let { Report.Category("Authors", it) },
+                publishers?.let { Report.Category("Publishers", it) }
+            )
+
+            return Report(month, year, summaryItems, categories)
         } catch (e: Exception) {
             return null
         }

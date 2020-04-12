@@ -147,16 +147,29 @@ full outer join yearly_expense
 on yearly_expense.year = yearly_sales.year;
 
 create view sales_by_author as 
-select author_name, sum(book.price*book_ordered.quantity) as sales
-from cust_order natural join book_ordered natural join book natural join author
+select purchase_year as year, purchase_month as month, author_name, sum(book.price * book_ordered.quantity) as sales
+from cust_order
+    natural join book_ordered
+    natural join book
+    natural join author
 where status not in ('Cart')
-group by author.author_name;
+group by author.author_name, cust_order.purchase_month, cust_order.purchase_year;
 
 create view sales_by_genre as 
-select genre, sum(book.price*book_ordered.quantity) as sales
-from cust_order natural join book_ordered natural join book
+select purchase_year as year, purchase_month as month, genre, sum(book.price * book_ordered.quantity) as sales
+from cust_order
+         natural join book_ordered
+         natural join book
 where status not in ('Cart')
-group by genre;
+group by genre, cust_order.purchase_month, cust_order.purchase_year;
+
+create view sales_by_publisher as
+select purchase_year as year, purchase_month as month, pub_name, sum(book.price * book_ordered.quantity) as sales
+from cust_order
+         natural join book_ordered
+         natural join book
+where status not in ('Cart')
+group by pub_name, cust_order.purchase_month, cust_order.purchase_year;
 
 CREATE VIEW books_in_carts AS
 SELECT order_num, quantity, isbn, stock

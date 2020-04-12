@@ -66,3 +66,12 @@ INSERT INTO author VALUES (?, ?)
 --"remove" a book
 UPDATE book SET legacy_item = true WHERE isbn = ?
 
+--get a monthly report of sales vs. expenses
+SELECT * FROM monthly_sales_vs_expense WHERE month = ? AND year = ?
+--get sales by genre for a specific month ordered by sales
+SELECT * FROM sales_by_genre WHERE month = ? AND year = ? ORDER BY sales
+--get sales by author for a specific month ordered by sales
+SELECT * FROM sales_by_author WHERE month = ? AND year = ? ORDER BY sales
+--get sales by publisher for a specific month ordered by sales
+SELECT * FROM sales_by_publisher WHERE month = ? AND year = ? ORDER BY sales
+

@@ -115,6 +115,13 @@ class CustomerControl(
                 loginOperation(authManager)
                 if (authManager.isAuthenticated) {
                     promptUser = authManager.customer!!.email
+
+                    view.println("Welcome back to Look Inna Book!")
+                    view.println("""
+                        |More helpful commands:
+                        |* logout   | Log out of your account
+                        |* cart     | View your shopping cart
+                    """.trimMargin())
                 }
                 true
             }
@@ -160,6 +167,7 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
         view.println(
             """
             Popular commands:
+            * register          | Register a new account
             * login             | Sign in to your account
             * search <query>    | Search for your favourite book
             * view <#ID>        | View details about a search result
