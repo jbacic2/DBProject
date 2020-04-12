@@ -22,7 +22,11 @@ class OwnerControl(private val managementRepository: ManagementRepository) : Con
                 return true
             }
             "report" -> {
-                view.printReport(managementRepository.getReport(5, 2020))
+                val month = args.getOrNull(1)?.toIntOrNull()
+                val year = args.getOrNull(2)?.toIntOrNull()
+                if (month != null && year != null) {
+                    managementRepository.getReport(month, year)?.let(view::printReport)
+                }
                 return true
             }
         }

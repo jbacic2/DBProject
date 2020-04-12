@@ -8,5 +8,5 @@ interface ManagementRepository {
 
     fun removeBook(isbn: String): Boolean
 
-    fun getReport(month: Int, year: Int): Report
+    fun getReport(month: Int, year: Int): Report?
 }

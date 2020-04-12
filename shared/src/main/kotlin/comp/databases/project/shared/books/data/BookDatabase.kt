@@ -3,6 +3,8 @@ package comp.databases.project.shared.books.data
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
+import comp.databases.project.shared.cart.model.Order
+import comp.databases.project.shared.reports.model.Report
 
 import java.lang.Exception
 import java.sql.*;
@@ -234,4 +236,28 @@ object BookDatabase {
         return true
     }
 
+    fun getMonthlyReport(month: Int, year: Int): Report? {
+        try {
+            val result =
+                connection.prepareStatement("SELECT * FROM monthly_sales_vs_expense WHERE month = ? AND year = ?")
+                    .apply {
+                        setInt(1, month)
+                        setInt(2, year)
+                    }.executeQuery()
+
+            if (result.next()) {
+                val sales: Double? = result.getDouble("sales")
+                val expense: Double? = result.getDouble("expense")
+
+                return Report(month, year, listOfNotNull(
+                    sales?.let { Report.LineItem("Sales", it) },
+                    expense?.let { Report.LineItem("Expenses", it) }
+                ), emptyList())
+            }
+        } catch (e: Exception) {
+            return null
+        }
+
+        return null
+    }
 }

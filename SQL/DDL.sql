@@ -133,12 +133,18 @@ from expense
 group by exp_year;
 
 create view monthly_sales_vs_expense as
-select *
-from monthly_sales natural join monthly_expense;
+select coalesce(monthly_sales.month, monthly_expense.month) as month,
+       coalesce(monthly_sales.year, monthly_expense.year) as year,
+       sales, (expense * -1) as expense
+from monthly_sales
+full outer join monthly_expense
+on monthly_expense.month = monthly_sales.month AND monthly_expense.year = monthly_sales.year;
 
 create view yearly_sales_vs_expense as
-select *
-from yearly_sales natural join yearly_expense;
+select coalesce(yearly_sales.year, yearly_expense.year) as year, sales, (expense * -1) as expense
+from yearly_sales
+full outer join yearly_expense
+on yearly_expense.year = yearly_sales.year;
 
 create view sales_by_author as 
 select author_name, sum(book.price*book_ordered.quantity) as sales

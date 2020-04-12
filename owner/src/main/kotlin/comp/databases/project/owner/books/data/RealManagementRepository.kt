@@ -9,7 +9,7 @@ object RealManagementRepository : ManagementRepository {
 
     override fun removeBook(isbn: String): Boolean = BookDatabase.removeBook(isbn)
 
-    override fun getReport(month: Int, year: Int): Report {
-        TODO("Not yet implemented")
+    override fun getReport(month: Int, year: Int): Report? {
+        return BookDatabase.getMonthlyReport(month, year)
     }
 }
