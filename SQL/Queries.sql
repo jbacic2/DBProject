@@ -48,3 +48,12 @@ VALUES ('Cart', ?)
 SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item, order_num, quantity 
 FROM book NATURAL JOIN book_ordered NATURAL JOIN cust_order 
 WHERE status = 'Cart' AND cust_email = ?
+
+--adding a new book
+INSERT INTO book VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+--insert related authors for book
+INSERT INTO author VALUES (?, ?)
+
+--"remove" a book
+UPDATE book SET legacy_item = true WHERE isbn = ?
+
