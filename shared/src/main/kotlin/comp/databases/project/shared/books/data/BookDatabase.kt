@@ -1,4 +1,5 @@
 package comp.databases.project.shared.books.data
+
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
@@ -101,7 +102,7 @@ object BookDatabase {
         )
     }
 
-    fun searchBooks(query : String):List<Book>{
+    fun searchBooks(query: String): List<Book> {
         var isbn: String
         var title: String
         var genre: String
@@ -113,27 +114,28 @@ object BookDatabase {
         var publisher: String
         var percentOfSales: Double
         var isLegacyItem: Boolean
-        var bookList: MutableList<Book> =mutableListOf()
+        var bookList: MutableList<Book> = mutableListOf()
         val resSet: ResultSet;
         val pstmt: PreparedStatement;
 
-        if (query.length<=17){
-            pstmt = connection.prepareStatement("SELECT * FROM book WHERE isbn = CAST (? AS VARCHAR(17)) AND NOT legacy_item UNION SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT * FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT * FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
+        if (query.length <= 17) {
+            pstmt =
+                connection.prepareStatement("SELECT * FROM book WHERE isbn = CAST (? AS VARCHAR(17)) AND NOT legacy_item UNION SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT * FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT * FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
             pstmt.setString(1, query);
             pstmt.setString(2, query);
             pstmt.setString(3, query);
             pstmt.setString(4, query);
             pstmt.setString(5, query);
-        }
-        else if (query.length<=40){
-            pstmt = connection.prepareStatement("SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT * FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT * FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
+        } else if (query.length <= 40) {
+            pstmt =
+                connection.prepareStatement("SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT * FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT * FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
             pstmt.setString(1, query);
             pstmt.setString(2, query);
             pstmt.setString(3, query);
             pstmt.setString(4, query);
-        }
-        else{
-            pstmt = connection.prepareStatement("SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
+        } else {
+            pstmt =
+                connection.prepareStatement("SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
             pstmt.setString(1, query);
             pstmt.setString(2, query);
         }
@@ -151,17 +153,31 @@ object BookDatabase {
             publisher = resSet.getString(9)
             percentOfSales = resSet.getDouble(10)
             isLegacyItem = resSet.getBoolean(11)
-            bookList.add(Book(isbn,title,genre,coverImage, synopsis, pages, price, stock, publisher, percentOfSales, isLegacyItem))
+            bookList.add(
+                Book(
+                    isbn,
+                    title,
+                    genre,
+                    coverImage,
+                    synopsis,
+                    pages,
+                    price,
+                    stock,
+                    publisher,
+                    percentOfSales,
+                    isLegacyItem
+                )
+            )
         }
 
         val finalBooks: List<Book> = bookList
-	return finalBooks;
+        return finalBooks;
     }
 
-    fun getBookDetail(book: Book): BookDetail{
+    fun getBookDetail(book: Book): BookDetail {
         val resSet: ResultSet;
         var auth_name: String;
-        var authorList: MutableList<Author> =mutableListOf()
+        var authorList: MutableList<Author> = mutableListOf()
         val pstmt = connection.prepareStatement("SELECT author_name FROM author WHERE isbn = ?")
         pstmt.setString(1, book.isbn);
         resSet = pstmt.executeQuery();
@@ -169,9 +185,53 @@ object BookDatabase {
             auth_name = resSet.getString(1)
             authorList.add(Author(auth_name))
         }
-        return BookDetail(book,authorList)
+        return BookDetail(book, authorList)
     }
 
+    fun addBook(book: BookDetail): Boolean {
+        val (detail, authors) = book
+        try {
+            connection.autoCommit = false
 
+            connection.prepareStatement("INSERT INTO book VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").apply {
+                setString(1, detail.isbn)
+                setString(2, detail.title)
+                setString(3, detail.genre)
+                setString(4, detail.coverImage)
+                setString(5, detail.synopsis)
+                setInt(6, detail.pages)
+                setDouble(7, detail.price)
+                setInt(8, detail.stock)
+                setString(9, detail.publisher)
+                setDouble(10, detail.percentOfSales)
+                setBoolean(11, detail.isLegacyItem)
+            }.executeUpdate()
+
+            connection.prepareStatement("INSERT INTO author VALUES (?, ?)").apply {
+                setString(2, detail.isbn)
+                authors.forEach { (name) ->
+                    setString(1, name)
+                    executeUpdate()
+                }
+            }
+
+            connection.commit()
+        } catch (e: Exception) {
+            connection.rollback()
+            return false
+        }
+        return true
+    }
+
+    fun removeBook(isbn: String): Boolean {
+        try {
+            connection.prepareStatement("UPDATE book SET legacy_item = true WHERE isbn = ?").apply {
+                setString(1, isbn)
+            }.execute()
+        } catch (e: Exception) {
+            return false
+        }
+        return true
+    }
 
 }

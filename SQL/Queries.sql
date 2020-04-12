@@ -34,3 +34,11 @@ ON CONFLICT DO NOTHING
 --adding new user
 INSERT INTO customer 
 VALUES (CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(20)), CAST(? AS INT), CAST(? AS INT), CAST(? AS INT), CAST(? AS VARCHAR(20)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(8)))
+
+--adding a new book
+INSERT INTO book VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+--insert related authors for book
+INSERT INTO author VALUES (?, ?)
+
+--"remove" a book
+UPDATE book SET legacy_item = true WHERE isbn = ?

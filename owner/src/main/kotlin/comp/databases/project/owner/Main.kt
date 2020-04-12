@@ -4,6 +4,7 @@ import com.jakewharton.picnic.table
 import comp.databases.project.owner.books.addBookOperation
 import comp.databases.project.owner.books.data.DummyRepository
 import comp.databases.project.owner.books.data.ManagementRepository
+import comp.databases.project.owner.books.data.RealManagementRepository
 import comp.databases.project.owner.books.removeBookOperation
 import comp.databases.project.owner.reports.view.printReport
 import comp.databases.project.shared.Control
@@ -90,5 +91,5 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
 }
 
 fun main() {
-    OwnerControl(DummyRepository).run()
+    OwnerControl(RealManagementRepository).run()
 }
