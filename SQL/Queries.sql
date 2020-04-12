@@ -34,3 +34,17 @@ ON CONFLICT DO NOTHING
 --adding new user
 INSERT INTO customer 
 VALUES (CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(20)), CAST(? AS INT), CAST(? AS INT), CAST(? AS INT), CAST(? AS VARCHAR(20)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(8)))
+
+--check if the user has a 'Cart'
+SELECT order_num
+FROM cust_order
+WHERE status = 'Cart' AND cust_email = ?
+
+--Adding a cart for a user
+INSERT INTO cust_order (status, cust_email)
+VALUES ('Cart', ?)
+
+-- getting user's current cart 
+SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item, order_num, quantity 
+FROM book NATURAL JOIN book_ordered NATURAL JOIN cust_order 
+WHERE status = 'Cart' AND cust_email = ?

@@ -37,6 +37,6 @@ CREATE TRIGGER check_date_order_update AFTER UPDATE ON cust_order
 	FOR EACH ROW
 	EXECUTE PROCEDURE check_date_order_tf();
 	
-CREATE TRIGGER check_date_order_insert AFTER INSERT ON cust_order
+/*CREATE TRIGGER check_date_order_insert AFTER INSERT ON cust_order
 	FOR EACH ROW
-	EXECUTE PROCEDURE check_date_order_tf();
+	EXECUTE PROCEDURE check_date_order_tf();*/

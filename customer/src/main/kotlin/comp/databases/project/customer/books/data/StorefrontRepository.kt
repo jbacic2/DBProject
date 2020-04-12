@@ -19,7 +19,7 @@ interface StorefrontRepository {
 
     fun updateCartItem(isbn: String, quantity: Int)
 
-    fun getCart(): Cart?
+    fun getCart(email: String): Cart?
 
     fun submitOrder(address: Address? = null): Order?
 

@@ -47,10 +47,10 @@ class CustomerControl(
                             viewState = StoreViewState.DetailView(detail)
                         }
                     } catch (e:Exception){
-                    view.println("Enter the number of a book ID on the screen")
+                        view.println("Enter the number of a book ID on the screen")
                     }
                 }
-                if(viewState is StoreViewState.CartView){
+                else if(viewState is StoreViewState.CartView){
                     try {
                         if (args[1].toInt() < (viewState as StoreViewState.CartView).items.size) {
                             val book = (viewState as StoreViewState.CartView).items[args[1].toInt()].book
@@ -62,23 +62,41 @@ class CustomerControl(
                         view.println("Enter the number of a book ID on the screen")
                     }
                 }
-                view.println("You must first search for Enter the number of a book ID on the screen")
+                else {
+                    view.println("You must first search for a book and then enter the number of a book ID to view it.")
+                }
                 true
             }
             "add" -> {
-                addOperation(storefrontRepository, viewState, args.getOrNull(1)?.toIntOrNull() ?: -1)
+                if (authManager.customer == null){
+                    view.println("You must first login to access a cart")
+                }
+                else{
+                    addOperation(storefrontRepository, viewState, args.getOrNull(1)?.toIntOrNull() ?: -1)
+                }
                 true
             }
             "remove" -> {
-                removeOperation(storefrontRepository, viewState, args.getOrNull(1)?.toIntOrNull() ?: -1)
+                if (authManager.customer == null){
+                    view.println("You must first login to access a cart")
+                }
+                else {
+                    removeOperation(storefrontRepository, viewState, args.getOrNull(1)?.toIntOrNull() ?: -1)
+                }
                 true
             }
             "cart" -> {
-                val cart = storefrontRepository.getCart()
-                view.printCart(cart)
-                cart?.let {
-                    viewState = StoreViewState.CartView(it.items)
+                if (authManager.customer == null){
+                    view.println("You must first login to put a book in the cart")
                 }
+                else{
+                    val cart = storefrontRepository.getCart(authManager.customer!!.email)
+                    view.printCart(cart)
+                    cart?.let {
+                        viewState = StoreViewState.CartView(it.items)
+                    }
+                }
+
                 true
             }
             "order" -> {

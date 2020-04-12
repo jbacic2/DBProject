@@ -2,6 +2,7 @@ package comp.databases.project.shared.books.data
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
+import comp.databases.project.shared.cart.model.Cart
 
 import java.lang.Exception
 import java.sql.*;
@@ -11,8 +12,7 @@ object BookDatabase {
         DriverManager.getConnection("jdbc:postgresql://localhost:8888/postgres", "postgres", "postgres");
 
     fun authenticate(email: String, password: String): Customer? {
-        val statement =
-            connection.prepareStatement("SELECT * FROM customer NATURAL JOIN postal_zone WHERE cust_email = ?");
+        val statement = connection.prepareStatement("SELECT * FROM customer NATURAL JOIN postal_zone WHERE cust_email = ?");
         statement.setString(1, email)
         val resSet: ResultSet = statement.executeQuery()
 
@@ -24,7 +24,8 @@ object BookDatabase {
                 resSet.getString(resSet.findColumn("city")),
                 resSet.getString(resSet.findColumn("country"))
             )
-            return Customer(
+
+            val cust = Customer(
                 email,
                 password,
                 resSet.getString(resSet.findColumn("card_num")),
@@ -33,6 +34,26 @@ object BookDatabase {
                 resSet.getInt(resSet.findColumn("cvc_code")),
                 address
             )
+
+
+            // check if the user has a cart
+            val cartCheckStmt = connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
+            cartCheckStmt.setString(1, email)
+            val cartCheckResSet:ResultSet = cartCheckStmt.executeQuery()
+            if (cartCheckResSet.next()){
+                //they already have a cart
+            }
+            else{
+                val makeCartStmt = connection.prepareStatement("INSERT INTO cust_order (status, cust_email) VALUES ('Cart', ?)")
+                makeCartStmt.setString(1, email)
+                try {
+                    makeCartStmt.executeUpdate();
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    println("Error when making a cart")
+                }
+            }
+            return cust
         }
         return null
     }
@@ -87,6 +108,16 @@ object BookDatabase {
         } catch (e: Exception) {
             e.printStackTrace()
             println("Error with new user info")
+            return null
+        }
+
+        val makeCartStmt = connection.prepareStatement("INSERT INTO cust_order (status, cust_email) VALUES ('Cart', ?)")
+        makeCartStmt.setString(1, email)
+        try {
+            makeCartStmt.executeUpdate();
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("Error when making a cart")
             return null
         }
 
@@ -172,6 +203,49 @@ object BookDatabase {
         return BookDetail(book,authorList)
     }
 
+    fun getCart(email: String): Cart?{
+        var isbn: String
+        var title: String
+        var genre: String
+        var coverImage: String?
+        var synopsis: String?
+        var pages: Int
+        var price: Double
+        var stock: Int
+        var publisher: String
+        var percentOfSales: Double
+        var isLegacyItem: Boolean
+        var id: Long = -1
+        var quantity: Long
+        var itemList: MutableList<Cart.Item> =mutableListOf()
+        val resSet: ResultSet;
+        val pstmt = connection.prepareStatement("SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item, order_num, quantity FROM book NATURAL JOIN book_ordered NATURAL JOIN cust_order WHERE status = 'Cart' AND cust_email = ?")
+        pstmt.setString(1, email);
 
+        resSet = pstmt.executeQuery();
+        while (resSet.next()) {
+            if (id.compareTo(-1) != 0 && id.compareTo(resSet.getInt(12)) != 0)
+                break;
+            isbn = resSet.getString(1)
+            title = resSet.getString(2)
+            genre = resSet.getString(3)
+            coverImage = resSet.getString(4)
+            synopsis = resSet.getString(5)
+            pages = resSet.getInt(6)
+            price = resSet.getDouble(7)
+            stock = resSet.getInt(8)
+            publisher = resSet.getString(9)
+            percentOfSales = resSet.getDouble(10)
+            isLegacyItem = resSet.getBoolean(11)
+            id = resSet.getLong(12)
+            quantity = resSet.getLong(13)
+            itemList.add(Cart.Item(Book(isbn,title,genre,coverImage, synopsis, pages, price, stock, publisher, percentOfSales, isLegacyItem), quantity))
+        }
+        if (id.compareTo(-1) == 0){ //didn't find a cart
+            return null
+        }
+        return Cart(id, itemList)
+
+    }
 
 }

@@ -93,7 +93,9 @@ object RealRepository : StorefrontRepository {
         TODO("Not yet implemented")
     }
 
-    override fun getCart(): Cart? = cart
+    override fun getCart(email: String): Cart?{
+        return BookDatabase.getCart(email)
+    }
 
     override fun submitOrder(address: Address?): Order? {
         TODO("Not yet implemented")

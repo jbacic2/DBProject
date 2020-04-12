@@ -6,7 +6,7 @@ VALUES ('WC1B 3DP', 'London', 'England');
 
 
 INSERT INTO publisher
-VALUES ('Bloomsbury', 50, 'Bedford Square', 'WC1B 3DP', 'contact@bloomsbury.com', '93824552879');
+VALUES ('Bloomsbury', '50', 'Bedford Square', 'WC1B 3DP', 'contact@bloomsbury.com', '93824552879');
 
 INSERT INTO phone 
 VALUES (4402076315600, 'Bloomsbury');
@@ -80,29 +80,29 @@ INSERT INTO postal_zone
 VALUES ('K1N 7A1', 'Ottawa', 'Canada');
 
 INSERT INTO customer
-VALUES ('someone@hello.com', 'pword', 4567456745674567, 12, 2020, 122, 12, 'Byward Market Square', 'K1N 7A1');
+VALUES ('someone@hello.com', 'pword', 4567456745674567, 12, 2020, 122, '12', 'Byward Market Square', 'K1N 7A1');
 
 INSERT INTO postal_zone
 VALUES ('K1S 5B6', 'Ottawa', 'Canada');
 
 INSERT INTO customer
-VALUES ('carl@cmail.ca', 'abc123', 1234567891234561, 11, 2022, 665, 1125, 'Colonel By Dr', 'K1S 5B6');
+VALUES ('carl@cmail.ca', 'abc123', 1234567891234561, 11, 2022, 665, '1125', 'Colonel By Dr', 'K1S 5B6');
 
-INSERT INTO cust_order 
-VALUES (1, 'Delivered', 3, 09, 2019, 12, 'Byward Market Square', 'K1N 7A1', 12, 'Byward Market Square', 'K1N 7A1', 'someone@hello.com');
+INSERT INTO cust_order (status, purchase_day, purchase_month, purchase_year, bill_street_num, bill_street_name, bill_postal_code, ship_street_num, ship_street_name, ship_postal_code, cust_email) 
+VALUES ('Delivered', 3, 09, 2019, '12', 'Byward Market Square', 'K1N 7A1', '12', 'Byward Market Square', 'K1N 7A1', 'someone@hello.com');
 
-INSERT INTO cust_order 
-VALUES (2, 'Delivered', 12, 11, 2019, 12, 'Byward Market Square', 'K1N 7A1', 12, 'Byward Market Square', 'K1N 7A1', 'someone@hello.com');
+INSERT INTO cust_order (status, purchase_day, purchase_month, purchase_year, bill_street_num, bill_street_name, bill_postal_code, ship_street_num, ship_street_name, ship_postal_code, cust_email)
+VALUES ('Delivered', 12, 11, 2019, '12', 'Byward Market Square', 'K1N 7A1', '12', 'Byward Market Square', 'K1N 7A1', 'someone@hello.com');
 
-INSERT INTO cust_order 
-VALUES (3, 'Delivered', 9, 3, 2020, 1125, 'Colonel By Dr,', 'K1S 5B6', 1125, 'Colonel By Dr,', 'K1S 5B6', 'carl@cmail.ca');
+INSERT INTO cust_order (status, purchase_day, purchase_month, purchase_year, bill_street_num, bill_street_name, bill_postal_code, ship_street_num, ship_street_name, ship_postal_code, cust_email)
+VALUES ('Delivered', 9, 3, 2020, '1125', 'Colonel By Dr,', 'K1S 5B6', '1125', 'Colonel By Dr,', 'K1S 5B6', 'carl@cmail.ca');
 
-INSERT INTO cust_order 
-VALUES (4, 'En Route', 1, 4, 2020, 1125, 'Colonel By Dr,', 'K1S 5B6', 1125, 'Colonel By Dr,', 'K1S 5B6', 'carl@cmail.ca');
+INSERT INTO cust_order (status, purchase_day, purchase_month, purchase_year, bill_street_num, bill_street_name, bill_postal_code, ship_street_num, ship_street_name, ship_postal_code, cust_email)
+VALUES ('En Route', 1, 4, 2020, '1125', 'Colonel By Dr,', 'K1S 5B6', '1125', 'Colonel By Dr,', 'K1S 5B6', 'carl@cmail.ca');	
 
 
-INSERT INTO cust_order (order_num, cust_email)
-VALUES (5, 'someone@hello.com');
+INSERT INTO cust_order (cust_email)
+VALUES ('someone@hello.com');
 
 INSERT INTO book_ordered
 values (1, '0-7475-3269-9', 2);

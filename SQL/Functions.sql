@@ -56,7 +56,7 @@ CREATE FUNCTION check_date_order_tf ()
 	RETURNS TRIGGER AS $$
 	BEGIN
 		IF NOT check_date(NEW.purchase_day,NEW.purchase_month,NEW.purchase_year) THEN
-		RAISE EXCEPTION 'Invalid Date: %, %, % is not a real day', NEW.exp_day,NEW.exp_month,NEW.exp_year;
+		RAISE EXCEPTION 'Invalid Date: %, %, % is not a real day', NEW.purchase_day,NEW.purchase_month,NEW.purchase_year;
 		END IF;
 	RETURN NEW;
 	END; $$ LANGUAGE plpgsql;
