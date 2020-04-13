@@ -190,3 +190,4 @@ from book
          join author on book.isbn = author.isbn
          where not legacy_item;
 create index idx_fts_search on search_index using gin(document);
+create unique index on search_index(isbn);
