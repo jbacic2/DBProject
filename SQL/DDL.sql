@@ -175,3 +175,18 @@ CREATE VIEW books_in_carts AS
 SELECT order_num, quantity, isbn, stock
 FROM cust_order NATURAL JOIN book_ordered NATURAL JOIN book
 WHERE cust_order.status IN ('Cart');
+
+--full text search
+create materialized view search_index as
+select book.isbn,
+       book.title,
+       setweight(to_tsvector(book.isbn), 'A') ||
+       setweight(to_tsvector(book.title), 'A') ||
+       setweight(to_tsvector(book.genre), 'B') ||
+       setweight(to_tsvector(book.pub_name), 'C') ||
+       setweight(to_tsvector(author.author_name), 'B') ||
+       setweight(to_tsvector(coalesce(book.synopsis, '')), 'D') as document
+from book
+         join author on book.isbn = author.isbn
+         where not legacy_item;
+create index idx_fts_search on search_index using gin(document);
