@@ -139,12 +139,13 @@ object BookDatabase {
 
     @ExperimentalStdlibApi
     fun searchBooks2(query: String): List<Book> {
+        val queryString = query.split(" ").joinToString(separator = " | ")
         try {
             val result =
                 connection.prepareStatement("select book.isbn as isbn, book.title as title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item from search_index join book on search_index.isbn = book.isbn where document @@ to_tsquery(?) order by ts_rank(document, to_tsquery(?)) DESC")
                     .apply {
-                        setString(1, "'$query'")
-                        setString(2, "'$query'")
+                        setString(1, queryString)
+                        setString(2, queryString)
                     }.executeQuery()
 
             return buildList {
@@ -188,8 +189,6 @@ object BookDatabase {
     fun addBook(book: BookDetail): Boolean {
         val (detail, authors) = book
         try {
-            connection.autoCommit = false
-
             connection.prepareStatement("INSERT INTO book VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").apply {
                 setString(1, detail.isbn)
                 setString(2, detail.title)
@@ -211,8 +210,6 @@ object BookDatabase {
                     executeUpdate()
                 }
             }
-
-            connection.commit()
         } catch (e: Exception) {
             connection.rollback()
             return false

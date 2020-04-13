@@ -1,3 +1,4 @@
+--checks that a given date is valid
 create function check_date (day int, month int, year int)
 	returns boolean as $$
 	declare valid_date boolean;
@@ -8,7 +9,7 @@ create function check_date (day int, month int, year int)
 			if day <= 28 then 
 				valid_date = TRUE;
 			end if;
-		
+
 			leap_year = FALSE;
 			if year % 4 = 0 and year % 100 != 0 then
 				leap_year = TRUE;
@@ -61,7 +62,7 @@ CREATE FUNCTION check_date_order_tf ()
 	RETURN NEW;
 	END; $$ LANGUAGE plpgsql;
 
--- this function will calcuate the number of books to be ordered which will be the number of books
+-- this function will calculate the number of books to be ordered which will be the number of books
 -- sold in the last month or be 10 if the number of books sold is less then 10
 CREATE FUNCTION calc_books_to_order (isbn varchar(17))
 	RETURNS INTEGER AS $$
@@ -85,38 +86,10 @@ CREATE FUNCTION calc_books_to_order (isbn varchar(17))
 	RETURN book_sum;
 	END; $$ LANGUAGE plpgsql;
 
---will order books if less then 10 in stock 
-/*
-CREATE FUNCTION restock_email_check()
-  RETURNS VOID 
-AS
-$$
-DECLARE 
-	 r book%rowtype;
-	 row_isbn varchar(17);
-BEGIN
-    FOR r in SELECT * 
-	FROM book AS A
-	LOOP
-		IF r.stock < 10 THEN
-			row_isbn = r.isbn;
-			INSERT INTO restock_email (day, month, year, isbn)
-			VALUES(CAST(EXTRACT(DAY FROM CAST(current_date AS DATE)) AS INTEGER), CAST(EXTRACT(MONTH FROM CAST(current_date AS DATE)) AS INTEGER), CAST(EXTRACT(YEAR FROM CAST(current_date AS DATE)) AS INTEGER),row_isbn);
-			UPDATE book AS B
-			SET stock = r.stock + calc_books_to_order(row_isbn)
-			WHERE B.isbn=row_isbn;
-		END IF;
-    END LOOP;
-END;
-$$ 
-LANGUAGE plpgsql; */
-
-
---used to make sure that a cart doesn't have more books then in stock 
+--used to make sure that a cart doesn't have more books than there are in stock
 CREATE FUNCTION check_quantity_in_cart() 
   RETURNS VOID 
-AS
-$$
+AS $$
 DECLARE 
 	 r books_in_carts%rowtype;
 BEGIN
@@ -133,7 +106,7 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
---Satement level trigger 
+--statement level trigger
 CREATE FUNCTION check_quantity_in_cart_tf()
 	RETURNS TRIGGER AS $$
 	BEGIN
@@ -145,8 +118,7 @@ CREATE FUNCTION check_quantity_in_cart_tf()
 -- will add the reduce the stock and if stock is less than 10 will send email 
 CREATE FUNCTION expense_royalties (order_num INT)
   RETURNS VOID 
-AS
-$$
+AS $$
 DECLARE 
 	 royalties NUMERIC(9,2);
 BEGIN
@@ -163,8 +135,7 @@ LANGUAGE plpgsql;
 -- will reduce the stock and if stock is less than 10 will send email 
 CREATE FUNCTION update_stock (order_num INT)
   RETURNS VOID 
-AS
-$$
+AS $$
 DECLARE 
 	 r book_ordered%rowtype;
 	 new_stock INTEGER;
@@ -181,7 +152,8 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
-
+--triggered when cart status is changed from 'Cart' to 'Awaiting Fulfillment'
+--updates the purchased books' stock levels and records publisher cut of sales as expenses
 CREATE FUNCTION cart_ordered_tf() 
    RETURNS trigger AS
 $$
@@ -200,19 +172,8 @@ END;
 $$ 
 LANGUAGE plpgsql;
 
-
-
-/*CREATE FUNCTION change_in_stock_tf()
-   RETURNS trigger AS
-$$
-BEGIN
-	PERFORM restock_email_check();
-	PERFORM check_quantity_in_cart();
-END;
-$$
-LANGUAGE plpgsql;*/
-
-
+--triggered if the stock level of a book drops below 10
+--orders new books based on previous sales and sends an email
 CREATE FUNCTION change_in_stock_tf()
    RETURNS trigger AS
 $$
@@ -237,81 +198,12 @@ END;
 $$
 LANGUAGE plpgsql;
 
-CREATE FUNCTION refresh_search_index()
-RETURNS TRIGGER
-AS $$
+--triggered when a new book is added
+--refreshes the materialized view used for searching books
+CREATE FUNCTION refresh_search_index() RETURNS trigger AS $$
 BEGIN
-REFRESH MATERIALIZED VIEW CONCURRENTLY search_index;
-RETURN NULL;
-END $$
-LANGUAGE plpgsql;
+    REFRESH MATERIALIZED VIEW CONCURRENTLY search_index;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
 
-/*CREATE PROCEDURE check_quantity_in_cart ()
-	BEGIN 
-		FOR r IN
-			SELECT * FROM cust_order NATURAL JOIN book_ordred NATURAL JOIN book
-			WHERE cust_order.status IN ('Cart')
-		LOOP
-			IF r.quantity > r.stock THEN
-				UPDATE book_ordred
-				SET quantity = r.stock 
-				WHERE order_num = r.order_num AND isbn=r.isbn
-			END IF;
-		END LOOP;
-		RETURN;
-	END; $$ LANGUAGE plpgsql;
-	
-CREATE PROCEDURE update_stock (order_num INT)
-	BEGIN
-		FOR r IN
-			SELECT * FROM book_ordred 
-			WHERE book_ordred.order_num = update_stock.order_num
-		LOOP
-			UPDATE book
-			SET stock = stock - r.quantity
-			WHERE book.isbn = r.isbn
-		END LOOP;
-	END; $$ LANGUAGE plpgsql;
-
-*/
-
-/*create function monthly_sales (year int)
-	returns tabel (
-		month int,
-		year  int,
-		sales numeric(9,2)
-	)
-    as $$
-	begin
-		select purchase_month as month, purchase_year as year, sum(book.price*book_ordred.quantity) as sales
-		from cust_order natural join  book_ordred natural join book
-		group by cust_order.purchase_year, cust_order.purchase_month 
-		having cust_order.purchase_year = monthly_sales.year  
-	end; $$ language plpgsql;
-
-create function sales_by_auth (year int)
-	returns tabel (
-		author_name varchar(40)
-		sales numeric(10,2)
-	)
-    as $$
-	begin
-		select purchase_month as month, purchase_year as year, sum(book.price*book_ordred.quantity) as sales
-		from cust_order natural join  book_ordred natural join book
-		group by cust_order.purchase_year, cust_order.purchase_month 
-		having cust_order.purchase_year = monthly_sales.year  
-	end; $$ language plpgsql;
-	
-	
-	create function make_order(order_num int)
-	returns tabel(
-		
-	)
-	begin atomic
-		update cust_order
-			set purchase_day = select extract(day from date current_date);
-			set purchase_month = select extract(month from date current_date);
-			set purchase_year = select extract(year from date current_date);
-			set status = 'Awaiting Fulfillment';
-			where cust_order.order_num = make_order.order_num
-	end;*/

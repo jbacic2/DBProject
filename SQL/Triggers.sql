@@ -37,23 +37,7 @@ CREATE TRIGGER check_date_restock_insert AFTER INSERT ON restock_email
 	FOR EACH ROW
 	EXECUTE PROCEDURE check_date_restock_tf();
 
-CREATE TRIGGER refresh_book_search_index AFTER INSERT ON book
+--update materialized view for full text search
+CREATE TRIGGER refresh_book_search_index AFTER INSERT OR UPDATE OR DELETE ON author
     FOR EACH STATEMENT
     EXECUTE PROCEDURE refresh_search_index();
-
-CREATE TRIGGER refresh_book_search_index AFTER UPDATE ON book
-    FOR EACH STATEMENT
-    EXECUTE PROCEDURE refresh_search_index();
-
---date checking cust_order
-/*CREATE TRIGGER check_date_order_update AFTER UPDATE ON cust_order
-	FOR EACH ROW
-	EXECUTE PROCEDURE check_date_order_tf();
-
-CREATE TRIGGER update_book_search_index AFTER INSERT OR UPDATE OR DELETE OR TRUNCATE ON book
-    FOR EACH STATEMENT
-    EXECUTE PROCEDURE refresh_search_index();
-	
-CREATE TRIGGER check_date_order_insert AFTER INSERT ON cust_order
-	FOR EACH ROW
-	EXECUTE PROCEDURE check_date_order_tf();*/
