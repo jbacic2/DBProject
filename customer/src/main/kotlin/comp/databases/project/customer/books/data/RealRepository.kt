@@ -66,25 +66,6 @@ object RealRepository : StorefrontRepository {
 
     override fun addToCart(isbn: String, quantity: Long, email: String): Boolean {
         return BookDatabase.addToCart(isbn,quantity,email)
-
-        /*if (cart != null) {
-            cart = cart?.copy(
-                items = cart!!.items + Cart.Item(
-                    dummyBooks.map { (book) -> book }.find { it.isbn == isbn }!!,
-                    quantity
-                )
-            )
-        } else {
-            cart = Cart(
-                5L, listOf(
-                    Cart.Item(
-                        dummyBooks.map { (book) -> book }.find { it.isbn == isbn }!!,
-                        quantity
-                    )
-                )
-            )
-        }*/
-        return true
     }
 
     override fun removeFromCart(isbn: String, email: String): Boolean {

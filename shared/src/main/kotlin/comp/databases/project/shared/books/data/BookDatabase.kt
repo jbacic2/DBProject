@@ -523,9 +523,7 @@ object BookDatabase {
         pstmt.setString(1, cust.email)
         val resSet: ResultSet = pstmt.executeQuery()
         while (resSet.next()){
-            println("while loop --- id: ${1}, getLong${resSet.getLong(2)}")
             if(resSet.getLong(2)==id){
-                println("IF --- id: ${1}, getLong${resSet.getLong(2)}")
                 isbn = resSet.getString(1)
                 title = resSet.getString(21)
                 genre = resSet.getString(22)
@@ -540,7 +538,6 @@ object BookDatabase {
                 quantity =resSet.getInt(20)
                 items.add(Order.Item(Book(isbn,title,genre,coverImage,synopsis, pages, price, stock, publisher, percentOfSales, isLegacyItem),quantity))
             }else{
-                println("ELSE --- id: ${1}, getLong${resSet.getLong(2)}")
                 if (id > -1){
                     order.add(Order(id,status,purchaseDay,purchaseMonth,purchaseYear, Address(billStreetNum,billStreetName,billPostal,billCity,billCountry),Address(shipStreetNum,shipStreetName,shipPostal,shipCity,shipCountry),customerEmail,items))
                 }
@@ -588,7 +585,6 @@ object BookDatabase {
             }
 
         }
-        println("Orders ${order}")
         return order
     }
 }

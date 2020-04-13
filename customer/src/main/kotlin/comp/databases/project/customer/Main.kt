@@ -184,11 +184,6 @@ ${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}${'$'}\\${'$'}${'$'}${'$'}${'$'}${'$'}
         """.trimIndent()
         )
         view.print("\n\n")
-        view.println("Here are some recommended books:")
-        storefrontRepository.getSuggestedBooks(5).forEachIndexed { index, (_, title) ->
-            view.println("${index + 1}. $title")
-        }
-        view.print("\n\n")
     }
 
     override fun onQuit() {
