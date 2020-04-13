@@ -1,15 +1,6 @@
--- for search by isbn, title, genre, pub_name, author_name where length is <=17
--- this is for general display 
-SELECT * FROM book WHERE isbn = CAST (? AS VARCHAR(17)) AND NOT legacy_item UNION SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT * FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT * FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item
-
--- when length is less than 40
--- search by title, genre, pub_name, author_name
-SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT * FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT * FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item
-
--- for any length
--- search by title, author_name
-SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item
-
+--search for books using FTS
+--search is performed across ISBN, title, genre, author name, publisher, and synopsis and ranked by how well the query parameter matches the results
+select book.isbn as isbn, book.title as title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item from search_index join book on search_index.isbn = book.isbn where document @@ to_tsquery(?) order by ts_rank(document, to_tsquery(?)) DESC
 
 -- get authors for a book
 SELECT author_name
@@ -82,4 +73,3 @@ SELECT * FROM sales_by_genre WHERE month = ? AND year = ? ORDER BY sales
 SELECT * FROM sales_by_author WHERE month = ? AND year = ? ORDER BY sales
 --get sales by publisher for a specific month ordered by sales
 SELECT * FROM sales_by_publisher WHERE month = ? AND year = ? ORDER BY sales
-

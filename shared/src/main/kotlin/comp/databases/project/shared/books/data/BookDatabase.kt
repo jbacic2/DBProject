@@ -137,76 +137,38 @@ object BookDatabase {
         )
     }
 
-    fun searchBooks(query: String): List<Book> {
-        var isbn: String
-        var title: String
-        var genre: String
-        var coverImage: String?
-        var synopsis: String?
-        var pages: Int
-        var price: Double
-        var stock: Int
-        var publisher: String
-        var percentOfSales: Double
-        var isLegacyItem: Boolean
-        var bookList: MutableList<Book> = mutableListOf()
-        val resSet: ResultSet;
-        val pstmt: PreparedStatement;
+    @ExperimentalStdlibApi
+    fun searchBooks2(query: String): List<Book> {
+        try {
+            val result =
+                connection.prepareStatement("select book.isbn as isbn, book.title as title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item from search_index join book on search_index.isbn = book.isbn where document @@ to_tsquery(?) order by ts_rank(document, to_tsquery(?)) DESC")
+                    .apply {
+                        setString(1, "'$query'")
+                        setString(2, "'$query'")
+                    }.executeQuery()
 
-        if (query.length <= 17) {
-            pstmt =
-                connection.prepareStatement("SELECT * FROM book WHERE isbn = CAST (? AS VARCHAR(17)) AND NOT legacy_item UNION SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT * FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT * FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
-            pstmt.setString(1, query);
-            pstmt.setString(2, query);
-            pstmt.setString(3, query);
-            pstmt.setString(4, query);
-            pstmt.setString(5, query);
-        } else if (query.length <= 40) {
-            pstmt =
-                connection.prepareStatement("SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT * FROM book WHERE genre = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT * FROM book WHERE pub_name = CAST (? AS VARCHAR(40)) AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
-            pstmt.setString(1, query);
-            pstmt.setString(2, query);
-            pstmt.setString(3, query);
-            pstmt.setString(4, query);
-        } else {
-            pstmt =
-                connection.prepareStatement("SELECT * FROM book WHERE title = ? AND NOT legacy_item UNION SELECT isbn, title, genre, cover_image, synopsis, num_pages, price, stock, pub_name, percent_of_sales, legacy_item FROM book NATURAL JOIN author WHERE author_name = ? AND NOT legacy_item")
-            pstmt.setString(1, query);
-            pstmt.setString(2, query);
+            return buildList {
+                while (result.next()) {
+                    add(
+                        Book(
+                            result.getString("isbn"),
+                            result.getString("title"),
+                            result.getString("genre"),
+                            result.getString("cover_image"),
+                            result.getString("synopsis"),
+                            result.getInt("num_pages"),
+                            result.getDouble("price"),
+                            result.getInt("stock"),
+                            result.getString("pub_name"),
+                            result.getDouble("percent_of_sales"),
+                            result.getBoolean("legacy_item")
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            return emptyList()
         }
-
-        resSet = pstmt.executeQuery();
-        while (resSet.next()) {
-            isbn = resSet.getString(1)
-            title = resSet.getString(2)
-            genre = resSet.getString(3)
-            coverImage = resSet.getString(4)
-            synopsis = resSet.getString(5)
-            pages = resSet.getInt(6)
-            price = resSet.getDouble(7)
-            stock = resSet.getInt(8)
-            publisher = resSet.getString(9)
-            percentOfSales = resSet.getDouble(10)
-            isLegacyItem = resSet.getBoolean(11)
-            bookList.add(
-                Book(
-                    isbn,
-                    title,
-                    genre,
-                    coverImage,
-                    synopsis,
-                    pages,
-                    price,
-                    stock,
-                    publisher,
-                    percentOfSales,
-                    isLegacyItem
-                )
-            )
-        }
-
-        val finalBooks: List<Book> = bookList
-        return finalBooks;
     }
 
     fun getBookDetail(book: Book): BookDetail {
@@ -350,11 +312,12 @@ object BookDatabase {
             } else emptyList()
 
             val genres = try {
-                val resultSet = connection.prepareStatement("SELECT * FROM sales_by_genre WHERE month = ? AND year = ? ORDER BY sales")
-                    .apply {
-                        setInt(1, month)
-                        setInt(2, year)
-                    }.executeQuery()
+                val resultSet =
+                    connection.prepareStatement("SELECT * FROM sales_by_genre WHERE month = ? AND year = ? ORDER BY sales")
+                        .apply {
+                            setInt(1, month)
+                            setInt(2, year)
+                        }.executeQuery()
 
                 val list = mutableListOf<Report.LineItem>()
                 while (resultSet.next()) {
@@ -414,28 +377,29 @@ object BookDatabase {
 
     fun addToCart(isbn: String, quantity: Long, email: String): Boolean {
         //get the Cart ot the current user
-        val cartCheckStmt = connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
+        val cartCheckStmt =
+            connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
         cartCheckStmt.setString(1, email)
-        val resSet:ResultSet = cartCheckStmt.executeQuery()
-        if (resSet.next()){
+        val resSet: ResultSet = cartCheckStmt.executeQuery()
+        if (resSet.next()) {
             val orderNum = resSet.getInt(1)
 
             //update the cart to add the product
-            val addStmt = connection.prepareStatement("INSERT INTO book_ordered VALUES (CAST(? AS INT), CAST(? AS VARCHAR(17)), CAST(? AS INT)) ON CONFLICT (order_num, isbn) DO UPDATE SET quantity = book_ordered.quantity + CAST(? AS INT)");
+            val addStmt =
+                connection.prepareStatement("INSERT INTO book_ordered VALUES (CAST(? AS INT), CAST(? AS VARCHAR(17)), CAST(? AS INT)) ON CONFLICT (order_num, isbn) DO UPDATE SET quantity = book_ordered.quantity + CAST(? AS INT)");
             addStmt.setInt(1, orderNum)
             addStmt.setString(2, isbn)
             addStmt.setLong(3, quantity)
             addStmt.setLong(4, quantity)
             try {
                 addStmt.executeUpdate()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 println(e)
                 println("Unable to add book to cart")
                 return false
             }
             return true
-        }
-        else{
+        } else {
             println("Error: The current user does not have a cart, try to logout and log back in")
             return false
         }
@@ -445,26 +409,27 @@ object BookDatabase {
 
     fun removeFromCart(isbn: String, email: String): Boolean {
         //get the Cart ot the current user
-        val cartCheckStmt = connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
+        val cartCheckStmt =
+            connection.prepareStatement("SELECT order_num FROM cust_order WHERE status = 'Cart' AND cust_email = ?");
         cartCheckStmt.setString(1, email)
-        val resSet:ResultSet = cartCheckStmt.executeQuery()
-        if (resSet.next()){
+        val resSet: ResultSet = cartCheckStmt.executeQuery()
+        if (resSet.next()) {
             val orderNum = resSet.getInt(1)
 
             //update the cart to add the product
-            val rmStmt = connection.prepareStatement("DELETE FROM book_ordered WHERE order_num = CAST(? AS INT) AND isbn = CAST(? AS VARCHAR(17))");
+            val rmStmt =
+                connection.prepareStatement("DELETE FROM book_ordered WHERE order_num = CAST(? AS INT) AND isbn = CAST(? AS VARCHAR(17))");
             rmStmt.setInt(1, orderNum)
             rmStmt.setString(2, isbn)
             try {
                 rmStmt.executeUpdate()
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 println(e)
                 println("Unable to remove book from cart")
                 return false
             }
             return true
-        }
-        else{
+        } else {
             println("Error: The current user does not have a cart, try to logout and log back in")
             return false
         }

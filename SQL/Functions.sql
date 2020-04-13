@@ -87,7 +87,7 @@ CREATE FUNCTION calc_books_to_order (isbn varchar(17))
 
 --will order books if less then 10 in stock 
 /*
-CREATE FUNCTION restock_email_check() 
+CREATE FUNCTION restock_email_check()
   RETURNS VOID 
 AS
 $$
@@ -202,18 +202,18 @@ LANGUAGE plpgsql;
 
 
 
-/*CREATE FUNCTION change_in_stock_tf() 
+/*CREATE FUNCTION change_in_stock_tf()
    RETURNS trigger AS
 $$
 BEGIN
 	PERFORM restock_email_check();
 	PERFORM check_quantity_in_cart();
 END;
-$$ 
+$$
 LANGUAGE plpgsql;*/
 
 
-CREATE FUNCTION change_in_stock_tf() 
+CREATE FUNCTION change_in_stock_tf()
    RETURNS trigger AS
 $$
 BEGIN
@@ -224,19 +224,27 @@ BEGIN
 	END IF;
 	RETURN NEW;
 END;
-$$ 
+$$
 LANGUAGE plpgsql;
 
-CREATE FUNCTION change_in_stock_check_carts_tf() 
+CREATE FUNCTION change_in_stock_check_carts_tf()
    RETURNS trigger AS
 $$
 BEGIN
 	PERFORM check_quantity_in_cart();
 	RETURN NULL;
 END;
-$$ 
+$$
 LANGUAGE plpgsql;
 
+CREATE FUNCTION refresh_search_index()
+RETURNS TRIGGER
+AS $$
+BEGIN
+REFRESH MATERIALIZED VIEW CONCURRENTLY search_index;
+RETURN NULL;
+END $$
+LANGUAGE plpgsql;
 
 /*CREATE PROCEDURE check_quantity_in_cart ()
 	BEGIN 

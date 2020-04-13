@@ -55,10 +55,9 @@ private val dummyBooks = listOf(
 object RealRepository : StorefrontRepository {
     override fun getSuggestedBooks(count: Int): List<Book> = dummyBooks.map { (book) -> book }
 
+    @ExperimentalStdlibApi
     override fun searchBooks(query: String): List<Book> {
-        var books: List<Book>
-        books = BookDatabase.searchBooks(query)
-        return books
+        return BookDatabase.searchBooks2(query)
     }
 
     override fun getBookDetail(book: Book): BookDetail{

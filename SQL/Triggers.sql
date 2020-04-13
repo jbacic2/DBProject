@@ -41,6 +41,10 @@ CREATE TRIGGER check_date_restock_insert AFTER INSERT ON restock_email
 /*CREATE TRIGGER check_date_order_update AFTER UPDATE ON cust_order
 	FOR EACH ROW
 	EXECUTE PROCEDURE check_date_order_tf();
+
+CREATE TRIGGER update_book_search_index AFTER INSERT OR UPDATE OR DELETE OR TRUNCATE ON book
+    FOR EACH STATEMENT
+    EXECUTE PROCEDURE refresh_search_index();
 	
 CREATE TRIGGER check_date_order_insert AFTER INSERT ON cust_order
 	FOR EACH ROW
