@@ -6,7 +6,7 @@ CREATE TRIGGER change_quantity_in_cart_insert BEFORE INSERT ON book_ordered
 	EXECUTE PROCEDURE check_quantity_in_cart_tf();
 	
 --When book stock changes make sure the the quantity is cart is ok
-CREATE TRIGGER change_in_stock AFTER UPDATE OF stock ON book
+CREATE TRIGGER change_in_stock BEFORE UPDATE OF stock ON book
 	FOR EACH ROW
 	EXECUTE PROCEDURE change_in_stock_tf();
 	
