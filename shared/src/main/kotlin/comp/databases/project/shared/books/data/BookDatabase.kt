@@ -487,8 +487,111 @@ object BookDatabase {
             e.printStackTrace()
             println("Error when making a new cart")
         }
-
         return true
+    }
 
+    fun getOrders(cust:Customer): List<Order> {
+        var id: Long = -1
+        var status: Order.Status = Order.Status.Cart
+        var purchaseDay: Int = 0
+        var purchaseMonth: Int = 0
+        var purchaseYear: Int = 0
+        var billStreetNum: String = ""
+        var billStreetName: String = ""
+        var billPostal: String = ""
+        var billCity: String = ""
+        var billCountry: String = ""
+        var shipStreetNum: String = ""
+        var shipStreetName: String = ""
+        var shipPostal: String = ""
+        var shipCity: String = ""
+        var shipCountry: String = ""
+        var customerEmail: String = ""
+        var isbn: String = ""
+        var title: String = ""
+        var genre: String = ""
+        var coverImage: String? = ""
+        var synopsis: String?= ""
+        var pages: Int = 0
+        var price: Double = 0.0
+        var stock: Int = 0
+        var publisher: String = ""
+        var percentOfSales: Double = 0.0
+        var isLegacyItem: Boolean = true
+        var quantity: Int = 0
+        var items: MutableList<Order.Item> =  mutableListOf()
+        var order: MutableList<Order> =  mutableListOf()
+
+        val pstmt = connection.prepareStatement("SELECT * FROM (cust_order JOIN postal_zone ON cust_order.bill_postal_code = postal_zone.postal_code) AS bill JOIN postal_zone ON bill.ship_postal_code = postal_zone.postal_code NATURAL JOIN book_ordered NATURAL JOIN book WHERE bill.status <> 'Cart' AND bill.cust_email = ?")
+        pstmt.setString(1, cust.email)
+        val resSet: ResultSet = pstmt.executeQuery()
+        while (resSet.next()){
+            println("while loop --- id: ${1}, getLong${resSet.getLong(2)}")
+            if(resSet.getLong(2)==id){
+                println("IF --- id: ${1}, getLong${resSet.getLong(2)}")
+                isbn = resSet.getString(1)
+                title = resSet.getString(21)
+                genre = resSet.getString(22)
+                coverImage = resSet.getString(23)
+                synopsis = resSet.getString(24)
+                pages = resSet.getInt(25)
+                price= resSet.getDouble(26)
+                stock = resSet.getInt(27)
+                publisher= resSet.getString(28)
+                percentOfSales= resSet.getDouble(29)
+                isLegacyItem = resSet.getBoolean(30)
+                quantity =resSet.getInt(20)
+                items.add(Order.Item(Book(isbn,title,genre,coverImage,synopsis, pages, price, stock, publisher, percentOfSales, isLegacyItem),quantity))
+            }else{
+                println("ELSE --- id: ${1}, getLong${resSet.getLong(2)}")
+                if (id > -1){
+                    order.add(Order(id,status,purchaseDay,purchaseMonth,purchaseYear, Address(billStreetNum,billStreetName,billPostal,billCity,billCountry),Address(shipStreetNum,shipStreetName,shipPostal,shipCity,shipCountry),customerEmail,items))
+                }
+                items = mutableListOf()
+                id = resSet.getLong(2)
+                if(resSet.getString(3) == "Awaiting Fulfillment"){
+                    status = Order.Status.AwaitingFulfillment
+                }
+                else if (resSet.getString(3) == "Awaiting Shipment"){
+                    status = Order.Status.AwaitingShipment
+                }
+                else if (resSet.getString(3) == "En Route"){
+                    status = Order.Status.AwaitingShipment
+                }
+                else{
+                    status = Order.Status.Delivered
+                }
+                purchaseDay = resSet.getInt(4)
+                purchaseMonth = resSet.getInt(5)
+                purchaseYear = resSet.getInt(6)
+                billStreetNum = resSet.getString(7)
+                billStreetName = resSet.getString(8)
+                billPostal = resSet.getString(9)
+                billCity = resSet.getString(15)
+                billCountry = resSet.getString(16)
+                shipStreetNum = resSet.getString(10)
+                shipStreetName = resSet.getString(11)
+                shipPostal = resSet.getString(12)
+                shipCity = resSet.getString(18)
+                shipCountry = resSet.getString(19)
+                customerEmail = resSet.getString(13)
+                isbn = resSet.getString(1)
+                title = resSet.getString(21)
+                genre = resSet.getString(22)
+                coverImage = resSet.getString(23)
+                synopsis = resSet.getString(24)
+                pages = resSet.getInt(25)
+                price= resSet.getDouble(26)
+                stock = resSet.getInt(27)
+                publisher= resSet.getString(28)
+                percentOfSales= resSet.getDouble(29)
+                isLegacyItem = resSet.getBoolean(30)
+                quantity =resSet.getInt(20)
+                items.add(Order.Item(Book(isbn,title,genre,coverImage,synopsis, pages, price, stock, publisher, percentOfSales, isLegacyItem),quantity))
+            }
+
+        }
+        println("Orders ${order}")
+        return order
     }
 }

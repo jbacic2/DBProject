@@ -53,9 +53,10 @@ UPDATE cust_order
 SET status = 'Awaiting Fulfillment', bill_street_num = CAST(? AS VARCHAR(20)), bill_street_name = CAST(? AS VARCHAR(40)), bill_postal_code = CAST(? AS VARCHAR(8)), ship_street_num = CAST(? AS VARCHAR(20)), ship_street_name = CAST(? AS VARCHAR(40)), ship_postal_code = CAST(? AS VARCHAR(8))
 WHERE status = 'Cart' AND cust_email = ?
 
--- 
-
-
+-- to look at previous orders
+SELECT * 
+FROM (cust_order JOIN postal_zone ON cust_order.bill_postal_code = postal_zone.postal_code) AS bill JOIN postal_zone ON bill.ship_postal_code = postal_zone.postal_code NATURAL JOIN book_ordered NATURAL JOIN book 
+WHERE bill.status <> 'Cart' AND bill.cust_email = ?
 
 --adding a new book
 INSERT INTO book VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

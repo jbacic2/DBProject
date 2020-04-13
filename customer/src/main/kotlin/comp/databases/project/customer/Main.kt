@@ -112,7 +112,12 @@ class CustomerControl(
                 true
             }
             "orders" -> {
-                view.printOrders(storefrontRepository.getOrders())
+                if (authManager.customer == null){
+                    view.println("You must first login look at your order history")
+                }
+                else{
+                    view.printOrders(storefrontRepository.getOrders(authManager.customer!!))
+                }
                 true
             }
             "login" -> {

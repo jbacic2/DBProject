@@ -103,7 +103,7 @@ object RealRepository : StorefrontRepository {
         return BookDatabase.submitOrder(cust, address)
     }
 
-    override fun getOrders(): List<Order> {
-        TODO("Not yet implemented")
+    override fun getOrders(cust:Customer): List<Order> {
+        return BookDatabase.getOrders(cust)
     }
 }

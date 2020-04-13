@@ -24,5 +24,5 @@ interface StorefrontRepository {
 
     fun submitOrder(cust: Customer, address: Address? = null): Boolean
 
-    fun getOrders(): List<Order>
+    fun getOrders(cust: Customer): List<Order>
 }

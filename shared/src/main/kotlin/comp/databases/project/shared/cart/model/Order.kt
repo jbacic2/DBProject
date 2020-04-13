@@ -20,12 +20,14 @@ data class Order(
     )
 
     enum class Status {
+        Cart,
         AwaitingFulfillment,
         AwaitingShipment,
         EnRoute,
         Delivered;
 
         fun asString() = when (this) {
+            Cart -> "Cart"
             AwaitingFulfillment -> "Awaiting Fulfillment"
             AwaitingShipment -> "Awaiting Shipment"
             EnRoute -> "En Route"
