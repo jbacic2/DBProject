@@ -55,7 +55,15 @@ VALUES (CAST(? AS INT), CAST(? AS VARCHAR(17)), CAST(? AS INT))
 ON CONFLICT (order_num, isbn) DO UPDATE SET quantity = book_ordered.quantity + CAST(? AS INT);
 
 --Remove from cart
-DELETE FROM book_ordered WHERE order_num =(CAST(? AS INT) AND isbn = CAST(? AS VARCHAR(17)))
+DELETE FROM book_ordered WHERE order_num = CAST(? AS INT) AND isbn = CAST(? AS VARCHAR(17))
+
+-- update cart to make order_num
+UPDATE cust_order
+SET status = 'Awaiting Fulfillment', bill_street_num = CAST(? AS VARCHAR(20)), bill_street_name = CAST(? AS VARCHAR(40)), bill_postal_code = CAST(? AS VARCHAR(8)), ship_street_num = CAST(? AS VARCHAR(20)), ship_street_name = CAST(? AS VARCHAR(40)), ship_postal_code = CAST(? AS VARCHAR(8))
+WHERE status = 'Cart' AND cust_email = ?
+
+-- 
+
 
 
 --adding a new book

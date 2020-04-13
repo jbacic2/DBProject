@@ -96,14 +96,18 @@ class CustomerControl(
                         viewState = StoreViewState.CartView(it.items)
                     }
                 }
-
                 true
             }
             "order" -> {
-                if (placeOrder(storefrontRepository) != null) {
-                    view.println("Order placed.")
-                } else {
-                    view.printerrln("Failed to place order.")
+                if (authManager.customer == null){
+                    view.println("You must first login to make an order")
+                }
+                else {
+                    if (placeOrder(storefrontRepository, authManager.customer!!)) {
+                        view.println("Order placed.")
+                    } else {
+                        view.printerrln("Failed to place order.")
+                    }
                 }
                 true
             }

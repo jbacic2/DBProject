@@ -2,6 +2,7 @@ package comp.databases.project.customer.books.data
 
 import comp.databases.project.shared.books.data.Address
 import comp.databases.project.shared.books.data.BookDatabase
+import comp.databases.project.shared.books.data.Customer
 import comp.databases.project.shared.books.model.Author
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
@@ -99,8 +100,8 @@ object RealRepository : StorefrontRepository {
         return BookDatabase.getCart(email)
     }
 
-    override fun submitOrder(address: Address?): Order? {
-        TODO("Not yet implemented")
+    override fun submitOrder(cust: Customer, address: Address?): Boolean {
+        return BookDatabase.submitOrder(cust, address)
     }
 
     override fun getOrders(): List<Order> {

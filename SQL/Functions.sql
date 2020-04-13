@@ -69,6 +69,7 @@ CREATE FUNCTION calc_books_to_order (isbn varchar(17))
 	DECLARE last_month INTEGER;
 	DECLARE last_month_year INTEGER;
 	BEGIN 
+		book_sum = 0;
 		last_month = CAST (EXTRACT(MONTH FROM CAST(current_date AS DATE)) AS INTEGER) - 1;
 		last_month_year = CAST (EXTRACT(YEAR FROM CAST(current_date AS DATE)) AS INTEGER);
 		IF last_month = 0 THEN
@@ -76,37 +77,39 @@ CREATE FUNCTION calc_books_to_order (isbn varchar(17))
 			last_month_year = last_month_year -1;
 		END IF;
 		SELECT SUM(quantity)
-		FROM cust_order NATURAL JOIN book_ordered 
-		WHERE isbn = calc_books_to_order.isbn AND purchase_month = last_month AND purchase_year = last_month_year INTO book_sum;
-		IF book_sum < 10 THEN
+		FROM cust_order JOIN book_ordered ON cust_order.order_num = book_ordered.order_num
+		WHERE book_ordered.isbn = calc_books_to_order.isbn AND purchase_month = last_month AND purchase_year = last_month_year INTO book_sum;
+		IF book_sum < 10 OR book_sum IS NULL THEN
 			book_sum = 10;
 		END IF;
 	RETURN book_sum;
 	END; $$ LANGUAGE plpgsql;
-	
+
 --will order books if less then 10 in stock 
+/*
 CREATE FUNCTION restock_email_check() 
   RETURNS VOID 
 AS
 $$
 DECLARE 
 	 r book%rowtype;
+	 row_isbn varchar(17);
 BEGIN
     FOR r in SELECT * 
-	FROM book
+	FROM book AS A
 	LOOP
 		IF r.stock < 10 THEN
+			row_isbn = r.isbn;
 			INSERT INTO restock_email (day, month, year, isbn)
-			VALUES(CAST(EXTRACT(DAY FROM CAST(current_date AS DATE)) AS INTEGER), CAST(EXTRACT(MONTH FROM CAST(current_date AS DATE)) AS INTEGER), CAST(EXTRACT(YEAR FROM CAST(current_date AS DATE)) AS INTEGER),r.isbn);
-			
-			UPDATE book
-			SET book.stock = book.stock + calc_books_to_order (r.isbn)
-			WHERE order_num = r.order_num AND book.isbn=r.isbn;
+			VALUES(CAST(EXTRACT(DAY FROM CAST(current_date AS DATE)) AS INTEGER), CAST(EXTRACT(MONTH FROM CAST(current_date AS DATE)) AS INTEGER), CAST(EXTRACT(YEAR FROM CAST(current_date AS DATE)) AS INTEGER),row_isbn);
+			UPDATE book AS B
+			SET stock = r.stock + calc_books_to_order(row_isbn)
+			WHERE B.isbn=row_isbn;
 		END IF;
     END LOOP;
 END;
 $$ 
-LANGUAGE plpgsql;
+LANGUAGE plpgsql; */
 
 
 --used to make sure that a cart doesn't have more books then in stock 
@@ -121,7 +124,7 @@ BEGIN
 	FROM books_in_carts
 	LOOP
         IF r.quantity > r.stock THEN
-				UPDATE book_ordred
+				UPDATE book_ordered
 				SET quantity = r.stock 
 				WHERE order_num = r.order_num AND isbn=r.isbn;
 		END IF;
@@ -168,7 +171,7 @@ DECLARE
 BEGIN
     FOR r in SELECT * 
 	FROM book_ordered
-	WHERE book_ordred.order_num = update_stock.order_num
+	WHERE book_ordered.order_num = update_stock.order_num
 	LOOP
         UPDATE book
 			SET stock = stock - r.quantity
@@ -190,15 +193,16 @@ BEGIN
 			SET purchase_day = CAST (EXTRACT(DAY FROM CAST(current_date AS DATE)) AS INTEGER), 
 			purchase_month = CAST (EXTRACT(MONTH FROM CAST(current_date AS DATE)) AS INTEGER),
 			purchase_year = CAST (EXTRACT(YEAR FROM CAST(current_date AS DATE)) AS INTEGER)
-			WHERE cust_order.order_num = update_order_status.order_num;
+			WHERE cust_order.order_num = NEW.order_num;
 	END IF;
+	RETURN NULL;
 END;
 $$ 
 LANGUAGE plpgsql;
 
 
 
-CREATE FUNCTION change_in_stock_tf() 
+/*CREATE FUNCTION change_in_stock_tf() 
    RETURNS trigger AS
 $$
 BEGIN
@@ -206,8 +210,32 @@ BEGIN
 	PERFORM check_quantity_in_cart();
 END;
 $$ 
+LANGUAGE plpgsql;*/
+
+
+CREATE FUNCTION change_in_stock_tf() 
+   RETURNS trigger AS
+$$
+BEGIN
+	IF(NEW.stock <10) THEN
+		NEW.stock = NEW.stock + calc_books_to_order(NEW.isbn);
+		INSERT INTO restock_email (day, month, year, isbn)
+		VALUES(CAST(EXTRACT(DAY FROM CAST(current_date AS DATE)) AS INTEGER), CAST(EXTRACT(MONTH FROM CAST(current_date AS DATE)) AS INTEGER), CAST(EXTRACT(YEAR FROM CAST(current_date AS DATE)) AS INTEGER),NEW.isbn);
+	END IF;
+	RETURN NEW;
+END;
+$$ 
 LANGUAGE plpgsql;
 
+CREATE FUNCTION change_in_stock_check_carts_tf() 
+   RETURNS trigger AS
+$$
+BEGIN
+	PERFORM check_quantity_in_cart();
+	RETURN NULL;
+END;
+$$ 
+LANGUAGE plpgsql;
 
 
 /*CREATE PROCEDURE check_quantity_in_cart ()

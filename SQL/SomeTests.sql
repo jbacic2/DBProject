@@ -85,8 +85,14 @@ VALUES ('someone@hello.com', 'pword', 4567456745674567, 12, 2020, 122, '12', 'By
 INSERT INTO postal_zone
 VALUES ('K1S 5B6', 'Ottawa', 'Canada');
 
+INSERT INTO postal_zone
+VALUES ('K1S 0R4', 'Ottawa', 'Canada');
+
 INSERT INTO customer
 VALUES ('carl@cmail.ca', 'abc123', 1234567891234561, 11, 2022, 665, '1125', 'Colonel By Dr', 'K1S 5B6');
+
+INSERT INTO customer
+VALUES ('carl@cmail.com', 'test', 888866666555, 11, 2022, 665, '1075', 'Bank St', 'K1S 0R4');
 
 INSERT INTO cust_order (status, purchase_day, purchase_month, purchase_year, bill_street_num, bill_street_name, bill_postal_code, ship_street_num, ship_street_name, ship_postal_code, cust_email) 
 VALUES ('Delivered', 3, 09, 2019, '12', 'Byward Market Square', 'K1N 7A1', '12', 'Byward Market Square', 'K1N 7A1', 'someone@hello.com');

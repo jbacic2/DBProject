@@ -470,4 +470,60 @@ object BookDatabase {
         }
         return false
     }
+
+    fun submitOrder(cust: Customer, address: Address?): Boolean {
+        //get the Cart for the current user
+        val postal_stmt =connection.prepareStatement("INSERT INTO postal_zone VALUES (CAST(? AS VARCHAR(8)), CAST(? AS VARCHAR(40)), CAST(? AS VARCHAR(40))) ON CONFLICT DO NOTHING");
+        if (address != null){
+            postal_stmt.setString(1, address.postalCode);
+            postal_stmt.setString(2, address.city);
+            postal_stmt.setString(3, address.country);
+
+            try{
+                postal_stmt.executeUpdate()
+            }
+            catch(e: Error){
+                println("Error: Unable to add shipping address")
+                return false
+            }
+        }
+
+        val pstmt = connection.prepareStatement("UPDATE cust_order SET status = 'Awaiting Fulfillment', bill_street_num = CAST(? AS VARCHAR(20)), bill_street_name = CAST(? AS VARCHAR(40)), bill_postal_code = CAST(? AS VARCHAR(8)), ship_street_num = CAST(? AS VARCHAR(20)), ship_street_name = CAST(? AS VARCHAR(40)), ship_postal_code = CAST(? AS VARCHAR(8)) WHERE status = 'Cart' AND cust_email = ?");
+        pstmt.setString(1, cust.address.streetNumber)
+        pstmt.setString(2, cust.address.streetName)
+        pstmt.setString(3, cust.address.postalCode)
+        if (address == null){
+            pstmt.setString(4, cust.address.streetNumber)
+            pstmt.setString(5, cust.address.streetName)
+            pstmt.setString(6, cust.address.postalCode)
+        }
+        else{
+            pstmt.setString(4, address.streetNumber)
+            pstmt.setString(5, address.streetName)
+            pstmt.setString(6, address.postalCode)
+        }
+        pstmt.setString(7, cust.email)
+
+        try{
+            pstmt.executeUpdate()
+        }
+        catch(e: Error){
+            println("Error: Unable update the cart status")
+            return false
+        }
+
+        //make a new cart
+        val makeCartStmt =
+            connection.prepareStatement("INSERT INTO cust_order (status, cust_email) VALUES ('Cart', ?)")
+        makeCartStmt.setString(1, cust.email)
+        try {
+            makeCartStmt.executeUpdate();
+        } catch (e: Exception) {
+            e.printStackTrace()
+            println("Error when making a new cart")
+        }
+
+        return true
+
+    }
 }

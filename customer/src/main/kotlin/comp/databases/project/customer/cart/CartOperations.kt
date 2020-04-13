@@ -4,6 +4,7 @@ import comp.databases.project.customer.books.data.StorefrontRepository
 import comp.databases.project.customer.data.StoreViewState
 import comp.databases.project.shared.Control
 import comp.databases.project.shared.books.data.Address
+import comp.databases.project.shared.books.data.Customer
 import comp.databases.project.shared.cart.model.Order
 
 private fun checkId(id: Int, list: List<*>): Boolean = id < list.size && id >= 0
@@ -75,7 +76,7 @@ fun Control.removeOperation(repository: StorefrontRepository, viewState: StoreVi
     }
 }
 
-fun Control.placeOrder(repository: StorefrontRepository): Order? {
+fun Control.placeOrder(repository: StorefrontRepository, cust: Customer): Boolean {
     var selection: String? = null
     while (selection !in arrayOf("y", "n")) {
         view.print("Use billing address as shipping address [y/n]: ")
@@ -83,12 +84,12 @@ fun Control.placeOrder(repository: StorefrontRepository): Order? {
 
         if (selection == null) {
             view.printerrln("Could not read input.")
-            return null
+            return false
         }
     }
 
     return if (selection == "y") {
-        repository.submitOrder()
+        repository.submitOrder(cust, null)
     } else {
         view.println("""
             |Shipping Address Details
@@ -96,20 +97,20 @@ fun Control.placeOrder(repository: StorefrontRepository): Order? {
         """.trimMargin())
 
         view.print("Street Number: ")
-        val streetNumber = view.readLine() ?: return null
+        val streetNumber = view.readLine() ?: return false
 
         view.print("Street Name: ")
-        val streetName = view.readLine() ?: return null
+        val streetName = view.readLine() ?: return false
 
         view.print("Postal Code: ")
-        val postalCode = view.readLine() ?: return null
+        val postalCode = view.readLine() ?: return false
 
         view.print("City: ")
-        val city = view.readLine() ?: return null
+        val city = view.readLine() ?: return false
 
         view.print("Country: ")
-        val country = view.readLine() ?: return null
+        val country = view.readLine() ?: return false
 
-        repository.submitOrder(Address(streetNumber, streetName, postalCode, city, country))
+        repository.submitOrder(cust, Address(streetNumber, streetName, postalCode, city, country))
     }
 }

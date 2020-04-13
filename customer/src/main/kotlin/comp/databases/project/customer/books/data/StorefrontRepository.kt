@@ -1,6 +1,7 @@
 package comp.databases.project.customer.books.data
 
 import comp.databases.project.shared.books.data.Address
+import comp.databases.project.shared.books.data.Customer
 import comp.databases.project.shared.books.model.Book
 import comp.databases.project.shared.books.model.BookDetail
 import comp.databases.project.shared.cart.model.Cart
@@ -21,7 +22,7 @@ interface StorefrontRepository {
 
     fun getCart(email: String): Cart?
 
-    fun submitOrder(address: Address? = null): Order?
+    fun submitOrder(cust: Customer, address: Address? = null): Boolean
 
     fun getOrders(): List<Order>
 }
