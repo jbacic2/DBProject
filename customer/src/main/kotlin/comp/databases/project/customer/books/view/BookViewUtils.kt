@@ -1,5 +1,6 @@
 package comp.databases.project.customer.books.view
 
+import com.jakewharton.picnic.TableSectionDsl
 import com.jakewharton.picnic.TextAlignment
 import com.jakewharton.picnic.table
 import comp.databases.project.shared.books.model.Book
@@ -10,6 +11,10 @@ import java.text.NumberFormat
 import java.util.*
 
 fun View.printSearchResults(results: List<Book>) {
+    fun TableSectionDsl.details() {
+        row("#ID", "Title", "Price", "ISBN", "Stock")
+    }
+
     val formatter = NumberFormat.getCurrencyInstance(Locale.CANADA)
     val table = table {
         cellStyle {
@@ -18,16 +23,24 @@ fun View.printSearchResults(results: List<Book>) {
             paddingRight = 1
         }
 
-        row("#ID", "Title", "Price", "ISBN")
+        header { details() }
+        footer { details() }
 
         results.forEachIndexed { index, book ->
             row {
                 cell(index) {
                     alignment = TextAlignment.MiddleCenter
                 }
-                cell(book.title)
-                cell(formatter.format(book.price))
-                cell(book.isbn)
+                cell(WordWrap.from(book.title).maxWidth(60).wrap())
+                cell(formatter.format(book.price)) {
+                    alignment = TextAlignment.MiddleRight
+                }
+                cell(book.isbn) {
+                    alignment = TextAlignment.MiddleLeft
+                }
+                cell("x${book.stock}") {
+                    alignment = TextAlignment.MiddleRight
+                }
             }
         }
     }
@@ -63,7 +76,7 @@ fun View.printBookDetail(book: BookDetail) {
         row {
             cell(book.detail.genre)
             cell("Pages: ${book.detail.pages}")
-            cell("Stock: ${book.detail.stock}")
+            cell("Stock: x${book.detail.stock}")
         }
 
         row {
